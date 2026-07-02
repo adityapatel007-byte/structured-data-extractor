@@ -141,7 +141,3 @@ streamlit run src/ui/app.py
 ## License
 
 MIT
-
-## About
-
-Built by **ASP** as part of an 8-project LLM portfolio series. This is Project 4 of 8.
