@@ -51,7 +51,7 @@ _Will be filled in after v1 evaluation run:_
 ```
 ┌──────────────┐      ┌───────────────┐      ┌────────────────────┐
 │  Streamlit   │─────►│    FastAPI    │─────►│   Extractor        │
-│      UI      │◄─────│   /extract    │◄─────│   (GPT-4o + vision)│
+│      UI      │◄─────│   /extract    │◄─────│  (GPT-5 nano+vision)│
 └──────────────┘      └───────────────┘      └────────────────────┘
                                                        │
                              ┌─────────────────────────┼─────────────────────┐
@@ -88,8 +88,8 @@ _Will be filled in after v1 evaluation run:_
 
 ```bash
 # 1. Clone + install
-git clone https://github.com/<you>/structured-data-extraction.git
-cd structured-data-extraction
+git clone https://github.com/adityapatel007-byte/structured-data-extractor.git
+cd structured-data-extractor
 python -m venv .venv && source .venv/bin/activate    # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
 
