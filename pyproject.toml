@@ -1,0 +1,35 @@
+[project]
+name = "structured-data-extraction"
+version = "0.1.0"
+description = "Multi-domain document extraction service: invoices, receipts, and SEC filings to schema-validated JSON."
+authors = [{ name = "ASP", email = "adityapatel1801@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM"]
+ignore = ["E501"]  # line-length handled by formatter
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v"
+# Coverage: run `pytest --cov=src --cov-report=term-missing --cov-report=html` locally.
+# Kept out of default addopts because coverage's temp-file cleanup fails on some
+# network/mounted filesystems (works fine on native Windows/Linux).
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/__init__.py"]
