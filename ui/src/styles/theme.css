@@ -1,0 +1,81 @@
+/*
+ * Paper & Ink — design tokens.
+ *
+ * Two moods, one system:
+ *   LIGHT is "morning at a well-designed newsroom" — warm cream paper, deep
+ *   ink navy, a coral that reads as red-orange in daylight.
+ *   DARK is "reading by lamplight" — warm charcoal (never pure black), warm
+ *   parchment ink, coral pushed brighter so it still reads at low luminance.
+ *
+ * All colors are OKLCH where reasonable so lightness swaps stay perceptually
+ * even between modes. Fallback hex is provided in comments for reference.
+ */
+
+:root,
+[data-theme="light"] {
+  /* Surfaces */
+  --bg: #f4efe4;              /* warm cream paper */
+  --surface: #fbf6e9;         /* lifted card, slightly brighter */
+  --surface-2: #efe8d5;       /* recessed panel */
+  --rule: #e0d6bd;            /* hairline dividers */
+
+  /* Ink */
+  --ink: #10203b;             /* body text — deep navy */
+  --ink-strong: #050f24;      /* headings */
+  --ink-soft: #536079;        /* secondary body */
+  --ink-mute: #8a8770;        /* tertiary / metadata */
+
+  /* Accents */
+  --accent: #c53a2c;          /* coral — CTAs, links */
+  --accent-hover: #a72c20;
+  --accent-soft: #f6d6d0;     /* wash for hover backgrounds */
+
+  --sage: #6b8e6a;            /* success / high confidence */
+  --mustard: #b58a1f;         /* warning */
+
+  /* Signal fills */
+  --confidence-high: #6b8e6a;
+  --confidence-mid: #b58a1f;
+  --confidence-low: #c53a2c;
+
+  /* Semantic */
+  --focus: #10203b;
+  --shadow: 20 10 30;         /* rgb components for the ink drop-shadow */
+  --shadow-opacity: 0.07;
+
+  /* Grain overlay opacity */
+  --grain: 0.035;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #141210;              /* warm charcoal, never true black */
+  --surface: #1c1917;
+  --surface-2: #221f1c;
+  --rule: #2b2622;
+
+  --ink: #ecdfc6;             /* warm parchment */
+  --ink-strong: #f7ecd6;
+  --ink-soft: #a89a80;
+  --ink-mute: #6e6552;
+
+  --accent: #e6604f;          /* coral, brighter for dark */
+  --accent-hover: #ff7967;
+  --accent-soft: #3b1e1a;
+
+  --sage: #96b895;
+  --mustard: #dcac48;
+
+  --confidence-high: #96b895;
+  --confidence-mid: #dcac48;
+  --confidence-low: #e6604f;
+
+  --focus: #ecdfc6;
+  --shadow: 0 0 0;
+  --shadow-opacity: 0.5;
+
+  --grain: 0.055;
+
+  color-scheme: dark;
+}

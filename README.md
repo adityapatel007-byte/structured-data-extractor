@@ -78,7 +78,7 @@ _Will be filled in after v1 evaluation run:_
 | PDF text | pdfplumber, PyMuPDF | Fast, robust, handles most layouts |
 | PDF images | pdf2image + Pillow | For scanned/image-heavy PDFs → vision model |
 | Backend | FastAPI | Async, auto OpenAPI docs, batteries included |
-| Frontend | Streamlit | Fastest path to a demo-worthy UI |
+| Frontend | React + Vite + Tailwind + Motion + React Three Fiber | Editorial "Paper & Ink" aesthetic — 3D paper sheet in the hero, kinetic type, dark/light mode. No generic AI-SaaS look. |
 | Eval | rapidfuzz, scikit-learn | Fuzzy text matching + P/R/F1 |
 | Container | Docker (multi-stage) | Portable, reproducible |
 | Deploy | Hugging Face Spaces | Free, AI-community-recognized |
@@ -100,9 +100,23 @@ cp .env.example .env
 # 3. Run the API
 uvicorn src.api.main:app --reload
 
-# 4. Run the UI (in another terminal)
-streamlit run src/ui/app.py
+# 4. Run the UI — Paper & Ink React + Motion + R3F frontend
+#    (in another terminal, from ui/)
+cd ui && npm install && npm run dev
+# then open http://localhost:5173
+
+# 5. (Optional) Evaluate against the committed sample ground truth.
+#    `selfcheck` mode uses a mock extractor to validate the eval pipeline (F1=1.0).
+python scripts/run_eval.py --dataset data/samples/sroie_sample.jsonl \
+    --doc-type receipt --mode selfcheck
+
+# 6. Benchmark a real model on your own ground-truth JSONL:
+python scripts/run_eval.py --dataset evaluation/ground_truth/sroie.jsonl \
+    --doc-type receipt --mode live --model gpt-5-nano
 ```
+
+Reports (per-record CSV + summary JSON + resume-ready markdown) land in
+`evaluation/reports/<UTC-timestamp>/`.
 
 ## Project structure
 
@@ -112,8 +126,11 @@ streamlit run src/ui/app.py
 │   ├── schemas/         # Pydantic schemas per doc type
 │   ├── extractors/      # LLM extraction logic
 │   ├── api/             # FastAPI backend
-│   ├── ui/              # Streamlit frontend
 │   └── utils/           # cost tracking, logging, config
+├── ui/                  # React + Motion + R3F frontend (Paper & Ink)
+│   ├── src/components/  # Hero, PaperScene (3D), Dropzone, ResultsPanel, ...
+│   ├── src/styles/      # theme.css (dark/light tokens) + globals.css
+│   └── package.json
 ├── tests/
 │   ├── unit/
 │   └── integration/
