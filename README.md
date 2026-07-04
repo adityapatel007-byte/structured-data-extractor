@@ -2,7 +2,7 @@
 
 > Multi-domain document extraction — turn invoices, receipts, and SEC filings into schema-validated JSON with confidence scoring, multi-model benchmarking, and quantified accuracy.
 
-[![CI](https://img.shields.io/badge/CI-pending-yellow)]()
+[![CI](https://github.com/adityapatel007-byte/structured-data-extractor/actions/workflows/ci.yml/badge.svg)](https://github.com/adityapatel007-byte/structured-data-extractor/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11+-blue)]()
 [![OpenAI](https://img.shields.io/badge/LLM-GPT--5%20nano-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()

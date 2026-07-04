@@ -12,7 +12,8 @@ Reference: https://rrc.cvc.uab.es/?ch=13
 """
 from __future__ import annotations
 
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from src.data_prep.parsers import clean_text, parse_date, parse_money
 from src.schemas import Address, Receipt

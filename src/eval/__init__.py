@@ -11,7 +11,7 @@ Public entry points:
     run_eval(records, extractor, doc_type, ...) -> EvalReport
     write_reports(report, out_dir) -> (csv_path, md_path)
 """
-from src.eval.runner import EvalReport, run_eval
 from src.eval.report import write_reports
+from src.eval.runner import EvalReport, run_eval
 
 __all__ = ["run_eval", "EvalReport", "write_reports"]

@@ -38,7 +38,7 @@ class ExtractionMetrics:
 class Timer:
     """Context manager for measuring wall-clock latency in ms."""
 
-    def __enter__(self) -> "Timer":
+    def __enter__(self) -> Timer:
         self._start = perf_counter()
         self.elapsed_ms = 0.0
         return self

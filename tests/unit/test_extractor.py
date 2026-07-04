@@ -21,7 +21,6 @@ from src.schemas import (
     Receipt,
 )
 
-
 # --- Prompt registry -------------------------------------------------------
 
 

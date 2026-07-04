@@ -106,7 +106,7 @@ class Invoice(StrictModel):
         return normalize_currency(v)
 
     @model_validator(mode="after")
-    def _sanity_check_totals(self) -> "Invoice":
+    def _sanity_check_totals(self) -> Invoice:
         """Sanity-check: if subtotal + tax + shipping ~= total, we're consistent.
 
         We don't reject on mismatch (the model may have transcribed one field

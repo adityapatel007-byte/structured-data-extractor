@@ -21,7 +21,6 @@ from src.schemas import (
     list_doc_types,
 )
 
-
 # --- Invoice ----------------------------------------------------------------
 
 

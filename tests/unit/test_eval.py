@@ -12,8 +12,6 @@ from __future__ import annotations
 
 from datetime import date
 
-import pytest
-
 from src.data_prep.writer import read_jsonl
 from src.eval.comparators import (
     compare,
@@ -28,7 +26,6 @@ from src.eval.metrics import aggregate, micro_macro, score_doc
 from src.eval.runner import run_eval
 from src.schemas import ExtractionResult, Receipt
 from src.utils.cost_tracker import ExtractionMetrics
-
 
 # --- Comparators -----------------------------------------------------------
 

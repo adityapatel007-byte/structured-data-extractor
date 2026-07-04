@@ -13,7 +13,21 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "SIM"]
-ignore = ["E501"]  # line-length handled by formatter
+ignore = ["E501", "UP017"]  # E501: line-length via formatter. UP017: datetime.UTC (3.11-only) — we still support timezone.utc for broader interpreter reach in tooling.
+
+[tool.ruff.lint.per-file-ignores]
+# HTTP-error taxonomy — these are our own class hierarchy, not surprises.
+# Renaming to `*Error` would leak "Error" everywhere at call sites without
+# adding meaning.
+"src/api/errors.py" = ["N818"]
+# FastAPI convention: File(...) / Depends() go in function default args.
+# The whole framework is built around this pattern.
+"src/api/routers/*.py" = ["B008"]
+# Parser branches carry different explanatory comments — a ternary would
+# drop them and hurt readability more than help.
+"src/data_prep/parsers.py" = ["SIM108"]
+# Test tuple-unpacking sometimes leaves parts unused for clarity.
+"tests/**/*.py" = ["B007"]
 
 [tool.black]
 line-length = 100

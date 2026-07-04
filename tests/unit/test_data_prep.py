@@ -5,7 +5,6 @@ of SROIE and CORD.
 """
 from __future__ import annotations
 
-import json
 from datetime import date
 from pathlib import Path
 
@@ -16,7 +15,6 @@ from src.data_prep.parsers import clean_text, parse_date, parse_money
 from src.data_prep.sroie import normalize_sroie_record
 from src.data_prep.writer import read_jsonl, write_jsonl
 from src.schemas import Receipt
-
 
 # --- Money parsing ---------------------------------------------------------
 

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import time as _time
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from statistics import mean
 from typing import Any
 

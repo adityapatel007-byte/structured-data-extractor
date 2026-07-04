@@ -19,7 +19,7 @@
  */
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { Group, Mesh } from "three";
 import * as THREE from "three";
 
@@ -62,18 +62,19 @@ export function PaperScene({ state }: Props) {
 
 function Sheet({ state }: { state: PaperState }) {
   const group = useRef<Group>(null!);
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  // Mouse position lives in a ref, not state, so pointer movement doesn't
+  // force React re-renders at ~60Hz. `useFrame` reads it directly on the next
+  // GPU tick, so parallax stays live without touching the render loop.
+  const mouse = useRef({ x: 0, y: 0 });
 
   // Track the mouse across the whole window — the parallax reads better when
   // it's tied to page position, not just the canvas.
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      setMouse({
-        x: (e.clientX / window.innerWidth) * 2 - 1,
-        y: -(e.clientY / window.innerHeight) * 2 + 1,
-      });
+      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
     };
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
   }, []);
 
@@ -88,9 +89,9 @@ function Sheet({ state }: { state: PaperState }) {
     const driftRotX = Math.sin(t * 0.4) * 0.05;
     const driftRotZ = Math.cos(t * 0.3) * 0.03;
 
-    // Parallax offset from mouse.
-    const paraX = mouse.x * 0.14;
-    const paraY = mouse.y * 0.08;
+    // Parallax offset from mouse (ref-based — no React re-renders).
+    const paraX = mouse.current.x * 0.14;
+    const paraY = mouse.current.y * 0.08;
 
     // Targets vary by state.
     const targetRotX = state === "extracted" ? -0.35 : driftRotX + paraY * 0.8;
@@ -117,14 +118,16 @@ function Sheet({ state }: { state: PaperState }) {
         <meshBasicMaterial color="#000000" transparent opacity={0.12} />
       </mesh>
 
-      {/* Main sheet — a slightly wider-than-tall rectangle. */}
+      {/* Main sheet — a slightly wider-than-tall rectangle.
+          Uses MeshBasicMaterial so the texture (which already contains its
+          own baked-in shading + gradient) reads at full brightness. Standard
+          PBR shading was dimming the printed text — user flagged this. */}
       <mesh castShadow receiveShadow>
         <boxGeometry args={[2.55, 3.4, 0.02]} />
-        <meshStandardMaterial
+        <meshBasicMaterial
           map={texture}
-          roughness={0.85}
-          metalness={0}
           side={THREE.DoubleSide}
+          toneMapped={false}
         />
       </mesh>
 
@@ -202,24 +205,35 @@ function Glow({ active }: { active: boolean }) {
  * that the sheet reads as a document rather than a blank plane.
  */
 function paperTexture(): THREE.CanvasTexture {
+  // Draw at 2× so the sheet stays sharp when the camera is close.
+  // `ctx.scale` lets us keep all layout coordinates in the original 512×680
+  // logical space — every font-size and offset below is unchanged.
+  const SCALE = 2;
+  const LOGICAL_W = 512;
+  const LOGICAL_H = 680;
   const c = document.createElement("canvas");
-  c.width = 512;
-  c.height = 680;
+  c.width = LOGICAL_W * SCALE;
+  c.height = LOGICAL_H * SCALE;
   const ctx = c.getContext("2d")!;
+  ctx.scale(SCALE, SCALE);
+  // From here on, treat the drawing surface as if it were LOGICAL_W × LOGICAL_H.
+  // Local aliases keep the layout math readable.
+  const cw = LOGICAL_W;
+  const ch = LOGICAL_H;
 
   // Base paper — warm cream with a subtle gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, c.height);
+  const grad = ctx.createLinearGradient(0, 0, 0, ch);
   grad.addColorStop(0, "#f8f2e2");
   grad.addColorStop(1, "#efe8d0");
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillRect(0, 0, cw, ch);
 
   // Speckle grain
   for (let i = 0; i < 2200; i++) {
     ctx.fillStyle = `rgba(120,100,60,${Math.random() * 0.04})`;
     ctx.fillRect(
-      Math.random() * c.width,
-      Math.random() * c.height,
+      Math.random() * cw,
+      Math.random() * ch,
       Math.random() * 1.6,
       Math.random() * 1.6
     );
@@ -230,7 +244,7 @@ function paperTexture(): THREE.CanvasTexture {
   ctx.lineWidth = 1.2;
   ctx.beginPath();
   ctx.moveTo(40, 96);
-  ctx.lineTo(c.width - 40, 96);
+  ctx.lineTo(cw - 40, 96);
   ctx.stroke();
 
   // Vendor/merchant label
@@ -241,10 +255,10 @@ function paperTexture(): THREE.CanvasTexture {
   // Ruled body lines (light)
   ctx.strokeStyle = "rgba(16,32,59,0.09)";
   ctx.lineWidth = 1;
-  for (let y = 130; y < c.height - 120; y += 26) {
+  for (let y = 130; y < ch - 120; y += 26) {
     ctx.beginPath();
     ctx.moveTo(40, y);
-    ctx.lineTo(c.width - 40, y);
+    ctx.lineTo(cw - 40, y);
     ctx.stroke();
   }
 
@@ -258,25 +272,25 @@ function paperTexture(): THREE.CanvasTexture {
   ];
   rows.forEach(([desc, amt], i) => {
     ctx.fillText(desc, 40, 156 + i * 26);
-    ctx.fillText(amt, c.width - 130, 156 + i * 26);
+    ctx.fillText(amt, cw - 130, 156 + i * 26);
   });
 
   // Total
   ctx.strokeStyle = "rgba(16,32,59,0.55)";
   ctx.beginPath();
   ctx.moveTo(40, 260);
-  ctx.lineTo(c.width - 40, 260);
+  ctx.lineTo(cw - 40, 260);
   ctx.stroke();
 
   ctx.fillStyle = "#10203b";
   ctx.font = 'italic 22px "Instrument Serif", serif';
   ctx.fillText("Total", 40, 292);
   ctx.font = 'italic 22px "Instrument Serif", serif';
-  ctx.fillText("$1,800.00", c.width - 140, 292);
+  ctx.fillText("$1,800.00", cw - 140, 292);
 
   // Bottom stamp — a red circle with "PAID" (ish)
-  const cx = c.width - 110;
-  const cy = c.height - 110;
+  const cx = cw - 110;
+  const cy = ch - 110;
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(-0.18);
@@ -296,7 +310,14 @@ function paperTexture(): THREE.CanvasTexture {
   ctx.restore();
 
   const tex = new THREE.CanvasTexture(c);
-  tex.anisotropy = 8;
+  // Sharpness knobs — user flagged text as bitty on the hero.
+  // • LinearFilter (no mipmap blur) keeps small type crisp at close camera range.
+  // • anisotropy 16 keeps text readable at glancing angles as the sheet tilts.
+  // • generateMipmaps off — we don't need distance LODs for a hero prop.
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.anisotropy = 16;
+  tex.generateMipmaps = false;
   tex.needsUpdate = true;
   return tex;
 }

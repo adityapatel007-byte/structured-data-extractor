@@ -21,7 +21,6 @@ import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
 
 from pydantic import BaseModel
 
@@ -32,7 +31,6 @@ from src.schemas import ExtractionResult
 from src.schemas.registry import get_schema
 from src.utils.cost_tracker import ExtractionMetrics
 from src.utils.logging import logger
-
 
 # ---------------------------------------------------------------------------
 # Extractor factories: pluggable strategies for how a JSONL record becomes an

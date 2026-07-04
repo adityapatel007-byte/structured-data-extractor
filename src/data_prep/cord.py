@@ -8,7 +8,8 @@ Reference: https://github.com/clovaai/cord
 """
 from __future__ import annotations
 
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from src.data_prep.parsers import clean_text, parse_money
 from src.schemas import Receipt, ReceiptLineItem

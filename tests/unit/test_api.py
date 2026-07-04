@@ -11,11 +11,10 @@ import io
 import pytest
 from fastapi.testclient import TestClient
 
-from src.api.deps import MAX_UPLOAD_BYTES, get_extractor
+from src.api.deps import get_extractor
 from src.api.main import create_app
 from src.schemas import ExtractionResult, Receipt
 from src.utils.cost_tracker import ExtractionMetrics
-
 
 # --- Fake extractor --------------------------------------------------------
 

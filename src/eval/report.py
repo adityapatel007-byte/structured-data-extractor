@@ -8,7 +8,6 @@ from pathlib import Path
 
 from src.eval.runner import EvalReport
 
-
 # --- CSV -------------------------------------------------------------------
 
 def write_per_record_csv(report: EvalReport, out_path: str | Path) -> Path:
