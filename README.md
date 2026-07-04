@@ -1,8 +1,21 @@
+---
+title: Structured Data Extractor
+emoji: 📄
+colorFrom: yellow
+colorTo: gray
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+short_description: Multi-domain document extraction — receipts, invoices, filings → schema-validated JSON
+---
+
 # Structured Data Extraction Service
 
 > Multi-domain document extraction — turn invoices, receipts, and SEC filings into schema-validated JSON with confidence scoring, multi-model benchmarking, and quantified accuracy.
 
 [![CI](https://github.com/adityapatel007-byte/structured-data-extractor/actions/workflows/ci.yml/badge.svg)](https://github.com/adityapatel007-byte/structured-data-extractor/actions/workflows/ci.yml)
+[![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Live%20demo-yellow)](https://huggingface.co/spaces/adityapatel007-byte/structured-data-extractor)
 [![Python](https://img.shields.io/badge/python-3.11+-blue)]()
 [![OpenAI](https://img.shields.io/badge/LLM-GPT--5%20nano-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
@@ -34,8 +47,20 @@ Enterprise doc extraction is one of the highest-demand LLM use cases in 2026. Th
 
 ## Live demo
 
-_v1 self-hosted via_ `docker compose up --build` — public HF Spaces / Render deploy is next.
-See [Quickstart](#quickstart) below._
+The full stack is on Hugging Face Spaces:
+
+> **[huggingface.co/spaces/adityapatel007-byte/structured-data-extractor](https://huggingface.co/spaces/adityapatel007-byte/structured-data-extractor)** — always-on, free tier
+
+Locally: `docker compose up --build` after cloning; hit [http://localhost:5173](http://localhost:5173).
+
+## Deploy your own to HF Spaces
+
+1. Create a new [HF Space](https://huggingface.co/new-space) → **Docker SDK**, blank template.
+2. Add `OPENAI_API_KEY` under **Settings → Repository secrets**.
+3. Point the Space at this repo (or push a fork). HF reads the YAML frontmatter
+   at the top of this README (`sdk: docker`, `app_port: 7860`), builds the root
+   `Dockerfile`, and exposes it on your Space URL. First build ~5-8 min; every
+   redeploy ~2-3 min thanks to layer caching.
 
 ## Quantified results
 
