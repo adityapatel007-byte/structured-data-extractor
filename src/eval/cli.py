@@ -59,7 +59,7 @@ def make_selfcheck_extractor(doc_type: str) -> ExtractorFn:
     return _extract
 
 
-def make_live_extractor(doc_type: str, model: str | None) -> ExtractorFn:
+def make_live_extractor(doc_type: str, model: str | None, reasoning_effort: str | None = None) -> ExtractorFn:
     """Real extractor. Each record must provide either `file_path` or `text`.
 
     Deferred import: keeps `--mode selfcheck` runs from requiring OpenAI creds.
@@ -87,7 +87,7 @@ def make_live_extractor(doc_type: str, model: str | None) -> ExtractorFn:
                 f"live extraction needs one of them."
             )
 
-        return ex.extract(file_bytes, filename, doc_type=doc_type, model_override=model)
+        return ex.extract(file_bytes, filename, doc_type=doc_type, model_override=model, reasoning_effort=reasoning_effort)
 
     return _extract
 
@@ -115,6 +115,16 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     p.add_argument("--model", default=None, help="Model override for live mode (e.g. gpt-5-nano).")
+    p.add_argument(
+        "--reasoning-effort",
+        default=None,
+        choices=["minimal", "low", "medium", "high"],
+        help=(
+            "gpt-5-only. Cuts internal chain-of-thought tokens. 'minimal' is "
+            "recommended for structured extraction — ~10-20x cheaper + faster "
+            "than the default with negligible quality drop."
+        ),
+    )
     p.add_argument("--limit", type=int, default=None, help="Cap on records for quick runs.")
     p.add_argument(
         "--output-dir",
@@ -140,8 +150,10 @@ def main(argv: list[str] | None = None) -> int:
         extractor = make_selfcheck_extractor(args.doc_type)
         model_label = "selfcheck"
     else:
-        extractor = make_live_extractor(args.doc_type, args.model)
+        extractor = make_live_extractor(args.doc_type, args.model, args.reasoning_effort)
         model_label = args.model or "default"
+        if args.reasoning_effort:
+            model_label = f"{model_label}_re-{args.reasoning_effort}"
 
     report = run_eval(
         records,

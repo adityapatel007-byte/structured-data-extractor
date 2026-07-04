@@ -29,28 +29,59 @@ Enterprise doc extraction is one of the highest-demand LLM use cases in 2026. Th
 - **Multi-model benchmarking** — quantifies GPT-5 nano vs GPT-5.4 vs GPT-5.5 cost/quality tradeoffs
 - **Evaluation harness** with precision / recall / F1 on public ground truth (SROIE, CORD)
 - **Cost + latency observability** — every extraction logs tokens and $
-- Full-stack: **FastAPI** backend, **Streamlit** UI, **Docker**, deployed on **HF Spaces**
+- Full-stack: **FastAPI** backend, **React + Motion + R3F** UI, **Docker**, GitHub Actions **CI**
 - **CI/CD** with GitHub Actions running tests + lint on every push
 
 ## Live demo
 
-_v1 (invoices) — coming soon on HF Spaces._
+_v1 self-hosted via_ `docker compose up --build` — public HF Spaces / Render deploy is next.
+See [Quickstart](#quickstart) below._
 
 ## Quantified results
 
-_Will be filled in after v1 evaluation run:_
+Live evaluation on **gpt-5-nano** with `reasoning_effort="minimal"`. 10 receipt
+records derived from public SROIE + CORD ground truth. Reports (per-record CSV,
+JSON summary, markdown) land in `evaluation/reports/<timestamp>/` after each run.
 
-| Domain | Dataset | Field-level F1 | Doc-level Accuracy | Cost / doc | Median Latency |
-|--------|---------|---------------|-------------------|-----------|---------------|
-| Receipts | SROIE (test) | _pending_ | _pending_ | _pending_ | _pending_ |
-| Receipts | CORD (test) | _pending_ | _pending_ | _pending_ | _pending_ |
-| Filings | SEC 10-K sample | _pending_ | _pending_ | _pending_ | _pending_ |
+| Domain   | Dataset (n=)      | Micro F1  | Macro F1  | Doc Exact | Cost / doc | Mean Latency |
+|----------|-------------------|-----------|-----------|-----------|------------|--------------|
+| Receipts | SROIE (5)         | **0.938** | **1.000** | 0.20      | **$0.012** | 6.3 s        |
+| Receipts | CORD (5)          | **0.914** | 0.839     | **0.80**  | **$0.012** | 8.2 s        |
+| Filings  | SEC 10-K sample   | _v2 in progress_ | _v2_ | _v2_ | _v2_    | _v2_         |
+
+**Read the numbers:**
+- **Micro F1 ≈ 0.92** across both datasets — the model gets ~92% of individual
+  fields correct on ground-truth-derived text.
+- **Doc-level exact match** is stricter (100% of fields right on one doc) and
+  swings by dataset: CORD receipts (short, simple line items) hit 0.80; SROIE
+  (freer-form Malaysian/Singaporean receipts with more optional fields) hits
+  0.20 — a single missing field kills the metric on those.
+- **$0.012 / doc** is the reasoning-tokens-included cost at `reasoning_effort=minimal`.
+  Default (non-minimal) reasoning was **$0.042 / doc, 30 s / doc** — the minimal
+  flag is a ~3.5× cost cut and ~4× latency cut with no measured quality loss
+  on this schema.
+- **Total spend for a full run: ~$0.12** — cheap enough to re-run on every
+  significant prompt/schema change.
+
+Reproduce locally:
+
+```bash
+python scripts/run_eval.py \
+  --dataset evaluation/smoke_sroie_sample.jsonl \
+  --doc-type receipt \
+  --mode live \
+  --model gpt-5-nano \
+  --reasoning-effort minimal
+```
+
+Next: multi-model benchmark (nano vs mini vs full gpt-5.4), then real image
+PDFs from the SROIE test split for a stricter, OCR-inclusive number.
 
 ## Architecture
 
 ```
 ┌──────────────┐      ┌───────────────┐      ┌────────────────────┐
-│  Streamlit   │─────►│    FastAPI    │─────►│   Extractor        │
+│  React UI    │─────►│    FastAPI    │─────►│   Extractor        │
 │      UI      │◄─────│   /extract    │◄─────│  (GPT-5 nano+vision)│
 └──────────────┘      └───────────────┘      └────────────────────┘
                                                        │

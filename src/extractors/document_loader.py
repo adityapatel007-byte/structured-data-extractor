@@ -156,6 +156,28 @@ def load_document(
             filename=filename,
         )
 
+    # --- Plain text ---------------------------------------------------------
+    # `.txt` (and other text-like extensions) come from the eval CLI's inline
+    # `text` field, and from OCR outputs. No images to render — the LLM works
+    # on the decoded string directly. Fall back to lossy UTF-8 decoding so a
+    # stray non-UTF byte doesn't kill the whole record.
+    if ext in {".txt", ".text", ".md", ".log"}:
+        try:
+            text = file_bytes.decode("utf-8", errors="replace").strip()
+        except Exception as e:
+            logger.error(f"Failed to decode text file {filename}: {e}")
+            return LoadedDocument(source_type="empty", filename=filename)
+
+        source_type = "text" if text else "empty"
+        logger.info(f"Loaded {filename}: source_type={source_type}, text_chars={len(text)}")
+        return LoadedDocument(
+            text=text,
+            images_b64=[],
+            source_type=source_type,
+            page_count=1 if text else 0,
+            filename=filename,
+        )
+
     # --- Unknown format -----------------------------------------------------
     logger.warning(f"Unknown file extension {ext!r} for {filename}. Treating as empty.")
     return LoadedDocument(source_type="empty", filename=filename)

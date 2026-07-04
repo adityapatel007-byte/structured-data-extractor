@@ -44,6 +44,7 @@ class DocumentExtractor:
         *,
         model_override: str | None = None,
         render_images: bool = True,
+        reasoning_effort: str | None = None,
     ) -> tuple[ExtractionResult, ExtractionMetrics]:
         """Extract a doc into an ExtractionResult[T] plus per-call metrics.
 
@@ -69,6 +70,7 @@ class DocumentExtractor:
             response_format=envelope_cls,
             messages=messages,
             model=model_override,
+            reasoning_effort=reasoning_effort,
         )
 
         # 5. Wrap into ExtractionResult.

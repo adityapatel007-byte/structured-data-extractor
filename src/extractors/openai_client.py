@@ -48,15 +48,32 @@ class OpenAIExtractionClient:
         response_format: type[BaseModel],
         messages: list[dict[str, Any]],
         model: str | None = None,
-        temperature: float = 0.0,
+        temperature: float | None = None,
+        reasoning_effort: str | None = None,
     ) -> tuple[BaseModel, ExtractionMetrics]:
         """Call OpenAI with structured outputs; return (parsed_object, metrics).
 
         - `response_format` is a Pydantic model class (envelope schema).
         - `messages` is standard OpenAI messages list, may include vision content.
-        - `temperature=0` for reproducibility on extraction workloads.
+        - `temperature` is only forwarded when explicitly set. gpt-5-family
+          models reject any override — they run at a fixed sampling profile —
+          so leaving this None is the right default. For gpt-4o and earlier
+          you can pass 0.0 explicitly for deterministic extraction.
+        - `reasoning_effort` (gpt-5 only) — one of "minimal", "low", "medium",
+          "high". Structured extraction is a well-formed task that rarely
+          benefits from long chain-of-thought, so "minimal" typically cuts
+          both cost and latency by ~10-20x with negligible quality loss.
         """
         active_model = model or self._default_model
+
+        # Only include optional params when the caller opted in. Passing None to
+        # OpenAI would 400 on some models; omitting the key lets the server
+        # pick its own default.
+        extra: dict[str, Any] = {}
+        if temperature is not None:
+            extra["temperature"] = temperature
+        if reasoning_effort is not None:
+            extra["reasoning_effort"] = reasoning_effort
 
         @retry(
             stop=stop_after_attempt(self._max_retries),
@@ -69,7 +86,7 @@ class OpenAIExtractionClient:
                 model=active_model,
                 messages=messages,
                 response_format=response_format,
-                temperature=temperature,
+                **extra,
             )
 
         with Timer() as t:

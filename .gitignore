@@ -60,9 +60,12 @@ data/processed/*.parquet
 !data/samples/           # small sample files ARE committed for demo
 
 # --- Evaluation outputs ---
-evaluation/reports/*.csv
-evaluation/reports/*.json
+# Reports land in evaluation/reports/<timestamp>/*.{csv,json,md} — ignore all
+# artifacts by default. The README/README-linked report gets committed by hand
+# after a keeper run.
+evaluation/reports/
 !evaluation/reports/.gitkeep
+!evaluation/reports/README.md
 
 # --- Streamlit ---
 .streamlit/secrets.toml

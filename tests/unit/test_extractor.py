@@ -207,3 +207,30 @@ def test_extractor_rejects_unknown_doc_type(_mock):
     extractor = DocumentExtractor()
     with pytest.raises(KeyError):
         extractor.extract(b"", filename="x.pdf", doc_type="bogus")
+
+
+def test_document_loader_handles_txt():
+    """Regression guard for the .txt handler added on 2026-07-04.
+
+    The eval CLI packages inline text records as `<id>.txt`, so the loader
+    must decode them into source_type='text' with no images rendered.
+    Previously fell through the 'unknown format' branch and killed live eval.
+    """
+    from src.extractors.document_loader import load_document
+
+    body = "TAN WOON YANN\nDATE: 2018-06-25\nTOTAL SGD 72.00"
+    doc = load_document(body.encode("utf-8"), filename="receipt.txt")
+    assert doc.source_type == "text"
+    assert doc.text == body
+    assert doc.images_b64 == []
+    assert doc.page_count == 1
+
+    # md/log/text also route through this branch
+    for ext in (".md", ".log", ".text"):
+        d = load_document(b"hello", filename=f"x{ext}")
+        assert d.source_type == "text"
+        assert d.text == "hello"
+
+    # empty text still valid, but reports as empty
+    empty = load_document(b"", filename="blank.txt")
+    assert empty.source_type == "empty"
