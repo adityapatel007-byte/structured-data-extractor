@@ -15,7 +15,7 @@ short_description: Multi-domain document extraction — receipts, invoices, fili
 > Multi-domain document extraction — turn invoices, receipts, and SEC filings into schema-validated JSON with confidence scoring, multi-model benchmarking, and quantified accuracy.
 
 [![CI](https://github.com/adityapatel007-byte/structured-data-extractor/actions/workflows/ci.yml/badge.svg)](https://github.com/adityapatel007-byte/structured-data-extractor/actions/workflows/ci.yml)
-[![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Live%20demo-yellow)](https://huggingface.co/spaces/adityapatel007-byte/structured-data-extractor)
+[![HF Space](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Live%20demo-yellow)](https://huggingface.co/spaces/aditya0103/structured-data-extractor)
 [![Python](https://img.shields.io/badge/python-3.11+-blue)]()
 [![OpenAI](https://img.shields.io/badge/LLM-GPT--5%20nano-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
@@ -49,7 +49,7 @@ Enterprise doc extraction is one of the highest-demand LLM use cases in 2026. Th
 
 The full stack is on Hugging Face Spaces:
 
-> **[huggingface.co/spaces/adityapatel007-byte/structured-data-extractor](https://huggingface.co/spaces/adityapatel007-byte/structured-data-extractor)** — always-on, free tier
+> **[huggingface.co/spaces/aditya0103/structured-data-extractor](https://huggingface.co/spaces/aditya0103/structured-data-extractor)** — always-on, free tier
 
 Locally: `docker compose up --build` after cloning; hit [http://localhost:5173](http://localhost:5173).
 
