@@ -7,7 +7,7 @@ sdk: docker
 app_port: 7860
 pinned: false
 license: mit
-short_description: Multi-domain document extraction — receipts, invoices, filings → schema-validated JSON
+short_description: Receipts + invoices to validated JSON, GPT-5 nano
 ---
 
 # Structured Data Extraction Service
