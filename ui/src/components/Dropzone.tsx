@@ -148,14 +148,25 @@ export function Dropzone({
       </div>
 
       {/* --- Options row ------------------------------------------------- */}
-      <div className="flex flex-wrap items-center justify-between gap-6 border-t border-[var(--rule)] pt-6">
+      <div className="relative z-10 flex flex-wrap items-center justify-between gap-6 border-t border-[var(--rule)] pt-6">
         <DocTypePicker value={docType} onChange={setDocType} />
 
         <button
           type="button"
           disabled={!file || busy}
           onClick={onExtract}
-          className="group inline-flex items-center gap-3 rounded-full bg-[var(--accent)] px-6 py-3 text-[14px] font-medium tracking-wide text-white transition-all duration-500 ease-editorial hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:bg-[var(--rule)] disabled:text-[var(--ink-mute)]"
+          data-cursor="focus"
+          style={{
+            backgroundColor: !file || busy ? "var(--surface-2)" : "var(--accent)",
+            color: !file || busy ? "var(--ink-mute)" : "#ffffff",
+            borderColor: !file || busy ? "var(--rule)" : "var(--accent)",
+            cursor: !file || busy ? "not-allowed" : "pointer",
+            boxShadow:
+              !file || busy
+                ? "none"
+                : "0 1px 0 rgba(0,0,0,0.08), 0 10px 26px -14px rgba(197,58,44,0.55)",
+          }}
+          className="group relative z-10 inline-flex items-center gap-3 rounded-full border px-6 py-3 text-[14px] font-semibold tracking-wide transition-all duration-300 ease-editorial hover:-translate-y-0.5"
         >
           {busy ? "Extracting…" : "Extract"}
           {!busy && <Arrow />}
@@ -197,7 +208,7 @@ function DocTypePicker({
     { key: "invoice", label: "Invoice" },
   ];
   return (
-    <div className="flex items-center gap-2">
+    <div className="relative z-10 flex items-center gap-2">
       <span className="eyebrow mr-2">Type</span>
       {opts.map((o) => {
         const active = value === o.key;
@@ -205,20 +216,18 @@ function DocTypePicker({
           <button
             key={o.key}
             type="button"
+            aria-pressed={active}
             onClick={() => onChange(o.key)}
-            className="relative rounded-full px-4 py-1.5 text-[12px] tracking-wide transition-colors duration-300"
+            data-cursor="focus"
             style={{
+              backgroundColor: active ? "var(--ink-strong)" : "transparent",
               color: active ? "var(--surface)" : "var(--ink-soft)",
+              borderColor: active ? "var(--ink-strong)" : "var(--rule)",
+              cursor: "pointer",
             }}
+            className="relative z-10 rounded-full border px-4 py-1.5 text-[12px] font-medium tracking-wide transition-colors duration-300 hover:border-[var(--ink)] hover:text-[var(--ink)]"
           >
-            {active && (
-              <motion.span
-                layoutId="doctype-pill"
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute inset-0 rounded-full bg-[var(--ink-strong)]"
-              />
-            )}
-            <span className="relative">{o.label}</span>
+            {o.label}
           </button>
         );
       })}

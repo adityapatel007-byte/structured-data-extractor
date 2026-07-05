@@ -33,9 +33,26 @@ export const SAMPLE_DOCS: SampleDoc[] = [
 export async function loadSampleAsFile(sample: SampleDoc): Promise<File> {
   const res = await fetch(sample.path);
   if (!res.ok) {
-    throw new Error(`Failed to load sample: ${sample.path}`);
+    throw new Error(`Sample not found: ${sample.path} (HTTP ${res.status})`);
   }
   const blob = await res.blob();
+  const type = blob.type || guessMimeFromPath(sample.path);
+  // Static hosts can return index.html for missing assets — guard against
+  // shipping that to the API as if it were a real document.
+  if (type.startsWith("text/html")) {
+    throw new Error(
+      `Sample "${sample.label}" is not installed on this deployment yet — try uploading your own file.`
+    );
+  }
   const filename = sample.path.split("/").pop() ?? "sample";
-  return new File([blob], filename, { type: blob.type });
+  return new File([blob], filename, { type });
+}
+
+function guessMimeFromPath(path: string): string {
+  const lower = path.toLowerCase();
+  if (lower.endsWith(".pdf")) return "application/pdf";
+  if (lower.endsWith(".png")) return "image/png";
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+  if (lower.endsWith(".webp")) return "image/webp";
+  return "application/octet-stream";
 }
