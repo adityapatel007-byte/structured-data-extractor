@@ -1,0 +1,71 @@
+doc_id,field,field_type,predicted,truth,outcome,score,latency_ms,cost_usd
+cord_sample_001,currency,exact,KRW,KRW,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[0].description,text,Iced Americano,Iced Americano,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[0].quantity,number,1,1,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[0].total,money,4500,4500,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[0].unit_price,money,4500,4500,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[1].description,text,Choco Chip Muffin,Choco Chip Muffin,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[1].quantity,number,1,1,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[1].total,money,3800,3800,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[1].unit_price,money,3800,3800,TP,1.0,6031.0,0.012625
+cord_sample_001,line_items[],number,2,2,TP,1.0,6031.0,0.012625
+cord_sample_001,merchant,text,Unknown merchant,Unknown merchant,TP,1.0,6031.0,0.012625
+cord_sample_001,subtotal,money,8300,8300,TP,1.0,6031.0,0.012625
+cord_sample_001,tax,money,830,830,TP,1.0,6031.0,0.012625
+cord_sample_001,total,money,9130,9130,TP,1.0,6031.0,0.012625
+cord_sample_002,currency,exact,KRW,KRW,TP,1.0,4906.3,0.011983
+cord_sample_002,line_items[0].description,text,Bibimbap Set,Bibimbap Set,TP,1.0,4906.3,0.011983
+cord_sample_002,line_items[0].quantity,number,2,2,TP,1.0,4906.3,0.011983
+cord_sample_002,line_items[0].total,money,24000,24000,TP,1.0,4906.3,0.011983
+cord_sample_002,line_items[0].unit_price,money,,12000,FN,0.0,4906.3,0.011983
+cord_sample_002,line_items[1].description,text,Miso Soup,Miso Soup,TP,1.0,4906.3,0.011983
+cord_sample_002,line_items[1].quantity,number,2,2,TP,1.0,4906.3,0.011983
+cord_sample_002,line_items[1].total,money,5000,5000,TP,1.0,4906.3,0.011983
+cord_sample_002,line_items[1].unit_price,money,,2500,FN,0.0,4906.3,0.011983
+cord_sample_002,line_items[],number,2,2,TP,1.0,4906.3,0.011983
+cord_sample_002,merchant,text,Unknown merchant,Unknown merchant,TP,1.0,4906.3,0.011983
+cord_sample_002,subtotal,money,29000,29000,TP,1.0,4906.3,0.011983
+cord_sample_002,tax,money,2900,2900,TP,1.0,4906.3,0.011983
+cord_sample_002,total,money,31900,31900,TP,1.0,4906.3,0.011983
+cord_sample_003,currency,exact,KRW,KRW,TP,1.0,4453.5,0.011678
+cord_sample_003,line_items[0].description,text,Latte,Latte,TP,1.0,4453.5,0.011678
+cord_sample_003,line_items[0].quantity,number,1,1,TP,1.0,4453.5,0.011678
+cord_sample_003,line_items[0].total,money,5000,5000,TP,1.0,4453.5,0.011678
+cord_sample_003,line_items[0].unit_price,money,5000,5000,TP,1.0,4453.5,0.011678
+cord_sample_003,line_items[],number,1,1,TP,1.0,4453.5,0.011678
+cord_sample_003,merchant,text,Unknown merchant,Unknown merchant,TP,1.0,4453.5,0.011678
+cord_sample_003,subtotal,money,5000,5000,TP,1.0,4453.5,0.011678
+cord_sample_003,tax,money,500,500,TP,1.0,4453.5,0.011678
+cord_sample_003,total,money,5500,5500,TP,1.0,4453.5,0.011678
+cord_sample_004,currency,exact,KRW,KRW,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[0].description,text,Kimchi Fried Rice,Kimchi Fried Rice,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[0].quantity,number,1,1,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[0].total,money,9500,9500,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[0].unit_price,money,,9500,FN,0.0,5115.1,0.012975
+cord_sample_004,line_items[1].description,text,Egg Roll,Egg Roll,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[1].quantity,number,1,1,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[1].total,money,3500,3500,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[1].unit_price,money,,3500,FN,0.0,5115.1,0.012975
+cord_sample_004,line_items[2].description,text,Soft Drink,Soft Drink,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[2].quantity,number,2,2,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[2].total,money,4000,4000,TP,1.0,5115.1,0.012975
+cord_sample_004,line_items[2].unit_price,money,,2000,FN,0.0,5115.1,0.012975
+cord_sample_004,line_items[],number,3,3,TP,1.0,5115.1,0.012975
+cord_sample_004,merchant,text,Unknown merchant,Unknown merchant,TP,1.0,5115.1,0.012975
+cord_sample_004,subtotal,money,17000,17000,TP,1.0,5115.1,0.012975
+cord_sample_004,tax,money,1700,1700,TP,1.0,5115.1,0.012975
+cord_sample_004,total,money,18700,18700,TP,1.0,5115.1,0.012975
+cord_sample_005,currency,exact,KRW,KRW,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[0].description,text,Espresso,Espresso,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[0].quantity,number,1,1,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[0].total,money,3500,3500,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[0].unit_price,money,3500,3500,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[1].description,text,Cheesecake Slice,Cheesecake Slice,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[1].quantity,number,1,1,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[1].total,money,6500,6500,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[1].unit_price,money,6500,6500,TP,1.0,5599.3,0.01259
+cord_sample_005,line_items[],number,2,2,TP,1.0,5599.3,0.01259
+cord_sample_005,merchant,text,Unknown merchant,Unknown merchant,TP,1.0,5599.3,0.01259
+cord_sample_005,subtotal,money,10000,10000,TP,1.0,5599.3,0.01259
+cord_sample_005,tax,money,1000,1000,TP,1.0,5599.3,0.01259
+cord_sample_005,total,money,11000,11000,TP,1.0,5599.3,0.01259

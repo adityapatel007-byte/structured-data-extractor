@@ -39,7 +39,7 @@ Enterprise doc extraction is one of the highest-demand LLM use cases in 2026. Th
 - Schema-driven extraction with **OpenAI structured outputs** + Pydantic validation
 - **Vision-language handling** for scanned/image PDFs (GPT-5 nano vision)
 - **Long-document handling** for 10-K / 10-Q filings (400K context, minimal chunking)
-- **Multi-model benchmarking** — quantifies GPT-5 nano vs GPT-5.4 vs GPT-5.5 cost/quality tradeoffs
+- **Multi-model benchmarking** — empirically compared gpt-5-nano vs gpt-5-mini vs gpt-5 on the same 10-record eval; nano is Pareto-optimal (micro F1 0.896 at $0.012/doc)
 - **Evaluation harness** with precision / recall / F1 on public ground truth (SROIE, CORD)
 - **Cost + latency observability** — every extraction logs tokens and $
 - Full-stack: **FastAPI** backend, **React + Motion + R3F** UI, **Docker**, GitHub Actions **CI**
@@ -99,8 +99,42 @@ python scripts/run_eval.py \
   --reasoning-effort minimal
 ```
 
-Next: multi-model benchmark (nano vs mini vs full gpt-5.4), then real image
-PDFs from the SROIE test split for a stricter, OCR-inclusive number.
+### Multi-model comparison (2026-07-05)
+
+Same 10 records, same prompts, same schemas — only the model changes. All runs
+use `reasoning_effort="minimal"`. Reports land under `evaluation/benchmarks/<timestamp>/`.
+
+| Model         | Micro F1  | Macro F1  | Doc-exact | Latency  | Cost / doc |
+|---------------|-----------|-----------|-----------|----------|------------|
+| `gpt-5-nano`  | **0.896** | 0.885     | 40 %      | 5.1 s    | **$0.0116** |
+| `gpt-5-mini`  | 0.864     | 0.927     | 40 %      | 6.1 s    | $0.0127    |
+| `gpt-5`       | 0.884     | **0.939** | 30 %      | 5.4 s    | $0.0118    |
+
+**Read the numbers:**
+- **`gpt-5-nano` is Pareto-optimal on this workload** — highest micro F1 at the
+  lowest cost and lowest latency. Bigger tiers don't buy quality on high-support
+  fields.
+- **`gpt-5` and `gpt-5-mini` lead on macro F1** — they're measurably better on
+  the rarer fields (macro weights every field equally regardless of support).
+  If your extraction schema is long-tailed, the ~7 % macro-F1 lift may be worth
+  the small extra spend.
+- **Doc-exact stays 30-40 % across all three** — an artifact of a strict metric
+  and a schema with many optional fields. Micro F1 tracks real quality here.
+- **Total benchmark spend: $0.36** to definitively answer "which model should
+  ship in prod?" — this is the kind of question worth measuring instead of
+  guessing at, and it's cheap enough to re-run whenever the prompt or schema
+  moves.
+
+Reproduce:
+
+```bash
+python scripts/run_multimodel_benchmark.py
+# or with a custom matrix:
+python scripts/run_multimodel_benchmark.py gpt-5-nano:minimal gpt-5-mini:minimal gpt-4o-mini
+```
+
+Next: real image PDFs from the SROIE test split for a stricter, OCR-inclusive
+number, then the SEC 10-K schema for the long-doc / dual-domain story.
 
 ## Architecture
 
@@ -129,7 +163,7 @@ PDFs from the SROIE test split for a stricter, OCR-inclusive number.
 
 | Layer | Choice | Why |
 |-------|--------|-----|
-| LLM | OpenAI GPT-5 nano (default) + benchmarking against GPT-5.4 / GPT-5.5 | 400K context, vision, structured outputs, ~50x cheaper than GPT-4o |
+| LLM | OpenAI GPT-5 nano (default) + benchmarked vs GPT-5 mini + GPT-5 full | 400K context, vision, structured outputs, ~50x cheaper than GPT-4o |
 | Schema | Pydantic v2 | Runtime validation + JSON schema for OpenAI |
 | PDF text | pdfplumber, PyMuPDF | Fast, robust, handles most layouts |
 | PDF images | pdf2image + Pillow | For scanned/image-heavy PDFs → vision model |

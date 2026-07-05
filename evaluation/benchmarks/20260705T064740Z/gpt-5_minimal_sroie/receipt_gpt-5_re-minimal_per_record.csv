@@ -1,0 +1,43 @@
+doc_id,field,field_type,predicted,truth,outcome,score,latency_ms,cost_usd
+sroie_sample_001,currency,exact,SGD,SGD,TP,1.0,7563.0,0.01218
+sroie_sample_001,line_items[],number,0,0,TP,1.0,7563.0,0.01218
+sroie_sample_001,merchant,text,TAN WOON YANN,TAN WOON YANN,TP,1.0,7563.0,0.01218
+sroie_sample_001,merchant_address.city,text,JOHOR BAHRU,,FP,0.0,7563.0,0.01218
+sroie_sample_001,merchant_address.country,exact,MY,,FP,0.0,7563.0,0.01218
+sroie_sample_001,merchant_address.line1,text,"789 KING STREET, TAMAN DAYA","789 KING STREET, TAMAN DAYA, 81100 JOHOR BAHRU",TP,0.898,7563.0,0.01218
+sroie_sample_001,merchant_address.postal_code,exact,81100,,FP,0.0,7563.0,0.01218
+sroie_sample_001,total,money,72,72,TP,1.0,7563.0,0.01218
+sroie_sample_001,transaction_date,date,2018-06-25,2018-06-25,TP,1.0,7563.0,0.01218
+sroie_sample_002,currency,exact,SGD,SGD,TP,1.0,5417.4,0.011383
+sroie_sample_002,line_items[],number,0,0,TP,1.0,5417.4,0.011383
+sroie_sample_002,merchant,text,SANYU STATIONERY SHOP,SANYU STATIONERY SHOP,TP,1.0,5417.4,0.011383
+sroie_sample_002,merchant_address.city,text,SHAH ALAM,,FP,0.0,5417.4,0.011383
+sroie_sample_002,merchant_address.line1,text,"NO. 31G&33G, JALAN SETIA INDAH X, U13/X","NO. 31G&33G, JALAN SETIA INDAH X, U13/X 40170 SHAH ALAM",TP,1.0,5417.4,0.011383
+sroie_sample_002,merchant_address.postal_code,exact,40170,,FP,0.0,5417.4,0.011383
+sroie_sample_002,total,money,16.3,16.3,TP,1.0,5417.4,0.011383
+sroie_sample_002,transaction_date,date,2018-02-19,2018-02-19,TP,1.0,5417.4,0.011383
+sroie_sample_003,currency,exact,SGD,SGD,TP,1.0,4327.8,0.01083
+sroie_sample_003,line_items[],number,0,0,TP,1.0,4327.8,0.01083
+sroie_sample_003,merchant,text,KEDAI PAPAN YEW CHUAN,KEDAI PAPAN YEW CHUAN,TP,1.0,4327.8,0.01083
+sroie_sample_003,merchant_address.city,text,DENGKIL,,FP,0.0,4327.8,0.01083
+sroie_sample_003,merchant_address.line1,text,LOT 276 JALAN BANTING,"LOT 276 JALAN BANTING, 43800 DENGKIL, SELANGOR",MISMATCH,0.765,4327.8,0.01083
+sroie_sample_003,merchant_address.postal_code,exact,43800,,FP,0.0,4327.8,0.01083
+sroie_sample_003,merchant_address.region,text,SELANGOR,,FP,0.0,4327.8,0.01083
+sroie_sample_003,total,money,110,110,TP,1.0,4327.8,0.01083
+sroie_sample_003,transaction_date,date,2018-05-10,2018-05-10,TP,1.0,4327.8,0.01083
+sroie_sample_004,currency,exact,SGD,SGD,TP,1.0,4916.9,0.01103
+sroie_sample_004,line_items[],number,0,0,TP,1.0,4916.9,0.01103
+sroie_sample_004,merchant,text,OJC MARKETING SDN BHD,OJC MARKETING SDN BHD,TP,1.0,4916.9,0.01103
+sroie_sample_004,merchant_address.city,text,MASAI,,FP,0.0,4916.9,0.01103
+sroie_sample_004,merchant_address.country,exact,MY,,FP,0.0,4916.9,0.01103
+sroie_sample_004,merchant_address.line1,text,"NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM","NO 2 & 4, JALAN BAYU 4, BANDAR SERI ALAM, 81750 MASAI",TP,0.928,4916.9,0.01103
+sroie_sample_004,merchant_address.postal_code,exact,81750,,FP,0.0,4916.9,0.01103
+sroie_sample_004,total,money,48.15,48.15,TP,1.0,4916.9,0.01103
+sroie_sample_004,transaction_date,date,2018-04-17,2018-04-17,TP,1.0,4916.9,0.01103
+sroie_sample_005,currency,exact,SGD,SGD,TP,1.0,5441.7,0.010953
+sroie_sample_005,line_items[],number,0,0,TP,1.0,5441.7,0.010953
+sroie_sample_005,merchant,text,AEON CO. (M) BHD,AEON CO. (M) BHD,TP,1.0,5441.7,0.010953
+sroie_sample_005,merchant_address.country,exact,MY,,FP,0.0,5441.7,0.010953
+sroie_sample_005,merchant_address.line1,text,"3RD FLR, AEON TAMAN MALURI SHOPPING CENTRE","3RD FLR, AEON TAMAN MALURI SHOPPING CENTRE",TP,1.0,5441.7,0.010953
+sroie_sample_005,total,money,39.2,39.2,TP,1.0,5441.7,0.010953
+sroie_sample_005,transaction_date,date,2018-11-30,2018-11-30,TP,1.0,5441.7,0.010953

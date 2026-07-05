@@ -1,0 +1,4 @@
+model,reasoning_effort,micro_f1,macro_f1,doc_exact_match,mean_latency_ms,mean_cost_usd,total_cost_usd,wall_time_s,n_docs,errors
+gpt-5-nano,minimal,0.8963,0.8852,0.4,5098.0,0.011635,0.1164,51.0,10,0
+gpt-5-mini,minimal,0.8639,0.9274,0.4,6115.0,0.012694,0.1269,61.16,10,0
+gpt-5,minimal,0.8843,0.9393,0.3,5377.0,0.011822,0.1183,53.78,10,0

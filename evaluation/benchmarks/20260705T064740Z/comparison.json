@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-07-05T06:50:39.328401+00:00",
+  "matrix": [
+    {
+      "model": "gpt-5-nano",
+      "reasoning_effort": "minimal"
+    },
+    {
+      "model": "gpt-5-mini",
+      "reasoning_effort": "minimal"
+    },
+    {
+      "model": "gpt-5",
+      "reasoning_effort": "minimal"
+    }
+  ],
+  "results": {
+    "gpt-5-nano@minimal": {
+      "n_docs": 10,
+      "errors": 0,
+      "micro_f1": 0.8963,
+      "macro_f1": 0.8852,
+      "doc_exact_match": 0.4,
+      "mean_latency_ms": 5098.0,
+      "mean_cost_usd": 0.011635,
+      "total_cost_usd": 0.1164,
+      "wall_time_s": 51.0
+    },
+    "gpt-5-mini@minimal": {
+      "n_docs": 10,
+      "errors": 0,
+      "micro_f1": 0.8639,
+      "macro_f1": 0.9274,
+      "doc_exact_match": 0.4,
+      "mean_latency_ms": 6115.0,
+      "mean_cost_usd": 0.012694,
+      "total_cost_usd": 0.1269,
+      "wall_time_s": 61.16
+    },
+    "gpt-5@minimal": {
+      "n_docs": 10,
+      "errors": 0,
+      "micro_f1": 0.8843,
+      "macro_f1": 0.9393,
+      "doc_exact_match": 0.3,
+      "mean_latency_ms": 5377.0,
+      "mean_cost_usd": 0.011822,
+      "total_cost_usd": 0.1183,
+      "wall_time_s": 53.78
+    }
+  }
+}
