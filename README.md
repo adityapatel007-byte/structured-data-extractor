@@ -72,7 +72,7 @@ JSON summary, markdown) land in `evaluation/reports/<timestamp>/` after each run
 |----------|-------------------|-----------|-----------|-----------|------------|--------------|
 | Receipts | SROIE (5)         | **0.938** | **1.000** | 0.20      | **$0.012** | 6.3 s        |
 | Receipts | CORD (5)          | **0.914** | 0.839     | **0.80**  | **$0.012** | 8.2 s        |
-| Filings  | SEC 10-K sample   | _v2 in progress_ | _v2_ | _v2_ | _v2_    | _v2_         |
+| Filings  | SEC 10-K (n=5)    | _v2 pipeline built — live numbers pending_ | | | | |
 
 **Read the numbers:**
 - **Micro F1 ≈ 0.92** across both datasets — the model gets ~92% of individual
@@ -159,6 +159,17 @@ number, then the SEC 10-K schema for the long-doc / dual-domain story.
                     └────────────────┘
 ```
 
+**Long-document handling (10-K path).** SEC filings are 50-250 pages and would
+cost ~$0.60/doc if we shipped the whole thing to the model on every call. So
+the filing path runs the document through a section chunker
+(`src/extractors/section_chunker.py`) that finds each `Item 1.`, `Item 1A.`,
+`Item 7.`, `Item 8.` heading via regex, deduplicates against the Table of
+Contents (keeping the last occurrence — the real section), and slices the
+plaintext into named chunks. Only the cover, Item 8 (financials), and Item 1A
+(risk factors) are stitched into the prompt — everything else is skipped.
+Result: ~30–40K prompt tokens per 10-K instead of ~150K, on the same
+gpt-5-nano @ minimal reasoning-effort configuration.
+
 ## Tech stack
 
 | Layer | Choice | Why |
@@ -208,6 +219,28 @@ python scripts/run_eval.py --dataset evaluation/ground_truth/sroie.jsonl \
 Reports (per-record CSV + summary JSON + resume-ready markdown) land in
 `evaluation/reports/<UTC-timestamp>/`.
 
+### 10-K (SEC filings) quick start
+
+```bash
+# 1. Download the 5-issuer watchlist (Apple, JPM, ExxonMobil, Pfizer, Walmart).
+#    Files land in data/raw/10k/ — plaintext, sidecar JSON, and XBRL companyfacts.
+python scripts/download_edgar.py
+
+# 2. Build a ground-truth JSONL from the sidecars + XBRL.
+python scripts/build_filings_gt.py
+
+# 3. Run the eval against a real model.
+python scripts/run_eval.py \
+    --dataset evaluation/smoke_filings_sample.jsonl \
+    --doc-type filing \
+    --mode live \
+    --model gpt-5-nano \
+    --reasoning-effort minimal
+```
+
+The filing extractor uses section-based chunking to keep per-doc cost around
+$0.05–0.15 instead of $0.60+ at whole-document context.
+
 ## Project structure
 
 ```
@@ -240,8 +273,8 @@ Reports (per-record CSV + summary JSON + resume-ready markdown) land in
 
 ## Roadmap
 
-- [x] **v1 — Invoices & Receipts pipeline + multi-model benchmark** _(in progress)_
-- [ ] v2 — SEC Filings pipeline (10-K / 10-Q, long-doc handling)
+- [x] **v1 — Invoices & Receipts pipeline + multi-model benchmark**
+- [x] **v2 — SEC 10-K pipeline** (schema + section chunker + EDGAR downloader, live eval pending)
 - [ ] v3 — Streaming extraction + async batch API
 - [ ] v4 — Fine-tuning experiment vs. base GPT-5 nano
 

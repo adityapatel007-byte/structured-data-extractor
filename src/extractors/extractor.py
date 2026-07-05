@@ -14,6 +14,7 @@ from src.extractors.document_loader import LoadedDocument, load_document
 from src.extractors.envelope import compute_overall_confidence, make_envelope
 from src.extractors.openai_client import OpenAIExtractionClient
 from src.extractors.prompts import get_prompt
+from src.extractors.section_chunker import chunk_filing
 from src.schemas import ExtractionResult
 from src.schemas.registry import get_schema
 from src.utils.cost_tracker import ExtractionMetrics
@@ -62,8 +63,13 @@ class DocumentExtractor:
         if loaded.source_type == "empty":
             raise ValueError(f"Could not load document {filename!r} (unknown or corrupt format).")
 
-        # 3. Build the messages.
-        messages = self._build_messages(system_prompt, loaded)
+        # 3. Build the messages. Filings use a section-aware path — a full 10-K
+        #    is ~150K tokens; we ship only cover + Item 8 + Item 1A to keep
+        #    per-call cost + latency reasonable and reduce distractor text.
+        if doc_type.strip().lower() == "filing":
+            messages = self._build_filing_messages(system_prompt, loaded)
+        else:
+            messages = self._build_messages(system_prompt, loaded)
 
         # 4. Call the model.
         envelope, metrics = self._client.parse_structured(
@@ -135,4 +141,65 @@ class DocumentExtractor:
         return [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_content},
+        ]
+
+    # ------------------------------------------------------------------
+    # Filing path
+    # ------------------------------------------------------------------
+
+    # Per-section byte caps. Real 10-K sections rarely exceed ~40 KB; 60 KB
+    # gives us headroom for verbose filers (JPM's Item 1A runs long) while
+    # keeping total prompt size ~30-40K tokens — well inside gpt-5-nano's cost
+    # sweet spot.
+    _FILING_COVER_BYTES = 6_000
+    _FILING_ITEM_1A_BYTES = 60_000
+    _FILING_ITEM_8_BYTES = 60_000
+
+    def _build_filing_messages(
+        self,
+        system_prompt: str,
+        loaded: LoadedDocument,
+    ) -> list[dict[str, Any]]:
+        """Message builder for the 10-K path.
+
+        Slices the loaded text into cover + Item 8 (financials) + Item 1A
+        (risk factors) and hands each to the model as a clearly-labeled block.
+        Filings are text-first — vision isn't used here (10-K images are
+        usually chart infographics, not extraction targets).
+        """
+        text = loaded.text or ""
+        chunked = chunk_filing(text, cover_bytes=self._FILING_COVER_BYTES)
+
+        cover = chunked.cover[: self._FILING_COVER_BYTES]
+        item_8 = chunked.get_text("8", default="(Item 8 not found in this filing.)")[
+            : self._FILING_ITEM_8_BYTES
+        ]
+        item_1a = chunked.get_text("1A", default="(Item 1A not found in this filing.)")[
+            : self._FILING_ITEM_1A_BYTES
+        ]
+
+        logger.info(
+            f"[filing] chunked: cover={len(cover)}B, "
+            f"item_8={len(item_8)}B (present={chunked.has('8')}), "
+            f"item_1a={len(item_1a)}B (present={chunked.has('1A')}), "
+            f"total_items={len(chunked.item_ids)}"
+        )
+
+        user_text = (
+            "Extract the structured filing data. Three relevant sections of the "
+            "10-K are provided below. Do NOT hallucinate values from other "
+            "sections not shown.\n\n"
+            "---COVER SECTION---\n"
+            f"{cover}\n"
+            "---END COVER SECTION---\n\n"
+            "---FINANCIAL SECTION (Item 8)---\n"
+            f"{item_8}\n"
+            "---END FINANCIAL SECTION---\n\n"
+            "---RISK FACTORS SECTION (Item 1A)---\n"
+            f"{item_1a}\n"
+            "---END RISK FACTORS SECTION---"
+        )
+        return [
+            {"role": "system", "content": system_prompt},
+            {"role": "user",   "content": [{"type": "text", "text": user_text}]},
         ]

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from src.schemas.filing import Filing
 from src.schemas.invoice import Invoice
 from src.schemas.receipt import Receipt
 
@@ -15,9 +16,7 @@ from src.schemas.receipt import Receipt
 _REGISTRY: dict[str, type[BaseModel]] = {
     "invoice": Invoice,
     "receipt": Receipt,
-    # v2 additions will land here:
-    # "sec_10k": Filing10K,
-    # "sec_10q": Filing10Q,
+    "filing":  Filing,   # SEC 10-K (v2). Same key handles 10-K and 10-K/A.
 }
 
 

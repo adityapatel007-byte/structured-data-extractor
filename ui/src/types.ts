@@ -3,7 +3,7 @@
  * Kept minimal — Pydantic v2 on the server is the source of truth.
  */
 
-export type DocType = "invoice" | "receipt";
+export type DocType = "invoice" | "receipt" | "filing";
 
 export interface FieldConfidence {
   field: string;

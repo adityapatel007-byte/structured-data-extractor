@@ -13,7 +13,7 @@ import { useCallback, useRef, useState } from "react";
 import type { DocType } from "@/types";
 import { SAMPLE_DOCS, loadSampleAsFile, type SampleDoc } from "@/lib/samples";
 
-const ACCEPT = "application/pdf,image/png,image/jpeg,image/webp,image/tiff,image/bmp";
+const ACCEPT = "application/pdf,image/png,image/jpeg,image/webp,image/tiff,image/bmp,text/plain,text/html,.txt,.htm,.html";
 
 interface Props {
   file: File | null;
@@ -206,6 +206,7 @@ function DocTypePicker({
   const opts: { key: DocType; label: string }[] = [
     { key: "receipt", label: "Receipt" },
     { key: "invoice", label: "Invoice" },
+    { key: "filing",  label: "10-K"    },
   ];
   return (
     <div className="relative z-10 flex items-center gap-2">
