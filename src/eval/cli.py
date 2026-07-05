@@ -99,10 +99,13 @@ def make_live_extractor(doc_type: str, model: str | None, reasoning_effort: str 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Structured-extraction evaluation harness")
     p.add_argument("--dataset", required=True, help="JSONL ground-truth file.")
+    # Choices come from the schema registry so adding a new doc type
+    # (see src/schemas/registry.py) auto-widens the CLI — no cli.py edit.
+    from src.schemas.registry import list_doc_types
     p.add_argument(
         "--doc-type",
         default="receipt",
-        choices=["invoice", "receipt"],
+        choices=list_doc_types(),
         help="Domain schema to evaluate against.",
     )
     p.add_argument(

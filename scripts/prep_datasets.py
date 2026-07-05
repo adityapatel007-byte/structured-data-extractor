@@ -27,9 +27,9 @@ from pathlib import Path
 # Make src importable when running as a script.
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.data_prep import cord as cord_loader   # noqa: E402
+from src.data_prep import cord as cord_loader  # noqa: E402
 from src.data_prep import sroie as sroie_loader  # noqa: E402
-from src.data_prep.writer import write_jsonl    # noqa: E402
+from src.data_prep.writer import write_jsonl  # noqa: E402
 from src.utils.logging import logger, setup_logging  # noqa: E402
 
 

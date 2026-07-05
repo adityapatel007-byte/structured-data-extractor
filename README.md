@@ -38,7 +38,7 @@ Enterprise doc extraction is one of the highest-demand LLM use cases in 2026. Th
 
 - Schema-driven extraction with **OpenAI structured outputs** + Pydantic validation
 - **Vision-language handling** for scanned/image PDFs (GPT-5 nano vision)
-- **Long-document handling** for 10-K / 10-Q filings (400K context, minimal chunking)
+- **Long-document handling** for 10-K filings — regex section chunker slices Items 1A + 8 out of ~150K-token documents to hit **$0.06/doc** (would've been ~$0.60/doc whole-doc)
 - **Multi-model benchmarking** — empirically compared gpt-5-nano vs gpt-5-mini vs gpt-5 on the same 10-record eval; nano is Pareto-optimal (micro F1 0.896 at $0.012/doc)
 - **Evaluation harness** with precision / recall / F1 on public ground truth (SROIE, CORD)
 - **Cost + latency observability** — every extraction logs tokens and $
@@ -72,7 +72,7 @@ JSON summary, markdown) land in `evaluation/reports/<timestamp>/` after each run
 |----------|-------------------|-----------|-----------|-----------|------------|--------------|
 | Receipts | SROIE (5)         | **0.938** | **1.000** | 0.20      | **$0.012** | 6.3 s        |
 | Receipts | CORD (5)          | **0.914** | 0.839     | **0.80**  | **$0.012** | 8.2 s        |
-| Filings  | SEC 10-K (n=5)    | _v2 pipeline built — live numbers pending_ | | | | |
+| Filings  | SEC 10-K (n=5)    | **0.560** | **0.569** | 0.00      | **$0.061** | 6.1 s        |
 
 **Read the numbers:**
 - **Micro F1 ≈ 0.92** across both datasets — the model gets ~92% of individual
@@ -87,6 +87,28 @@ JSON summary, markdown) land in `evaluation/reports/<timestamp>/` after each run
   on this schema.
 - **Total spend for a full run: ~$0.12** — cheap enough to re-run on every
   significant prompt/schema change.
+
+**Why the 10-K F1 is lower than the receipt F1** — this is a *harder* task and
+the number reflects that honestly:
+
+- **Unit-of-measure normalization.** 10-K income statements are printed
+  "in millions" or "in thousands." The extractor has to multiply back to
+  absolute dollars. When it misses the header, a $391B revenue lands as $391K
+  in the output — a 1,000,000× miss that reads as `False` on the money
+  comparator.
+- **Multi-year column selection.** Every 10-K shows the most recent fiscal
+  year alongside 1-2 prior years side-by-side. Picking the wrong column
+  produces a plausible-but-wrong number.
+- **Debt aggregation.** `total_debt` = short-term + long-term borrowings, which
+  the model must sum. Ground truth is computed the same way from XBRL, so a
+  model that reports "long-term debt" alone counts as a miss.
+- **Risk factors don't score.** Auto-generated ground truth left
+  `top_risk_factors` empty (there's no canonical source). So the F1 you see is
+  effectively "cover + financials" only. Qualitative risk-factor eval is a
+  v2.2 follow-up.
+- **Zero extraction errors** on all 5 filings — the section chunker + prompt
+  wiring is stable. What's missing is prompt tuning against the specific
+  failure modes above, which is where the next 15-20 F1 points live.
 
 Reproduce locally:
 
@@ -274,7 +296,7 @@ $0.05–0.15 instead of $0.60+ at whole-document context.
 ## Roadmap
 
 - [x] **v1 — Invoices & Receipts pipeline + multi-model benchmark**
-- [x] **v2 — SEC 10-K pipeline** (schema + section chunker + EDGAR downloader, live eval pending)
+- [x] **v2 — SEC 10-K pipeline** (schema + section chunker + EDGAR downloader, first live eval: 0.56 micro F1, $0.06/doc)
 - [ ] v3 — Streaming extraction + async batch API
 - [ ] v4 — Fine-tuning experiment vs. base GPT-5 nano
 

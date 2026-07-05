@@ -39,7 +39,6 @@ from pydantic import Field, field_validator
 from src.schemas.base import StrictModel
 from src.schemas.common import Address, MoneyAmount, normalize_currency, round_money
 
-
 # ---------------------------------------------------------------------------
 # 1) COVER PAGE
 # ---------------------------------------------------------------------------

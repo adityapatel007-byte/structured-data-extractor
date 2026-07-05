@@ -3,10 +3,7 @@ from __future__ import annotations
 
 import textwrap
 
-import pytest
-
 from src.extractors.section_chunker import chunk_filing
-
 
 SYNTHETIC_10K = textwrap.dedent("""\
     APPLE INC.
