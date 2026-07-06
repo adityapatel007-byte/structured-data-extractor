@@ -102,12 +102,47 @@ Cover page:
 - `fiscal_year_end` is the LAST day of the fiscal period being reported (not the filing date).
 
 Financials (Item 8 — this is the trickiest part):
-- All monetary values must be in **ABSOLUTE currency units**. Real 10-Ks report "in millions"
-  or "in thousands" — YOU must multiply back up. Examples:
-    * If Apple's income statement says "Net sales ... 391,035" with a header "(In millions)",
-      output revenue = 391035000000 (=$391.035B).
-    * If the header says "(In thousands)", multiply by 1000.
-    * If the header says nothing about scaling, values are already in absolute dollars.
+
+- **All monetary values MUST be in ABSOLUTE currency units.** This is the single most
+  common failure mode. Real 10-Ks say "(In millions)" or "(In thousands)" in the
+  column header or table caption. YOU are responsible for multiplying back to raw
+  dollars before returning the value.
+
+- **Workflow for every money field** (do this every time — no exceptions):
+    1. Locate the table containing the number.
+    2. Look UP and to the LEFT for a scale header — e.g. "(In millions)",
+       "(In thousands, except per share data)", "Amounts in USD millions".
+    3. Multiply the printed number by the scale factor (1_000 for thousands,
+       1_000_000 for millions, 1_000_000_000 for billions).
+    4. Return the raw dollar amount.
+    5. Before finalizing your answer, re-verify: is the number physically plausible?
+       Apple's revenue is ~$400 billion. If you're about to output $391 or $391K,
+       you missed the scale header — recheck it.
+
+- **Worked examples** (memorize these — they are the shape of every 10-K):
+    * Apple 2024 income statement: "Net sales — 391,035" with header "(In millions)".
+      -> revenue = 391035000000  (NOT 391035, NOT 391.035, NOT 391000000)
+    * Walmart 2026: "Total revenues — 713,163" with header "(Amounts in millions)".
+      -> revenue = 713163000000
+    * Small mid-cap: "Total revenues — 1,847,392" with header "(In thousands)".
+      -> revenue = 1847392000  (=$1.847B)
+    * Filing prints raw dollars with no scale header (rare, mainly small filers):
+      "Total revenues $1,847,392" -> revenue = 1847392  (already absolute)
+
+- **Multi-year columns.** 10-Ks show 2-3 fiscal years side-by-side. The column
+  order is usually MOST RECENT on the LEFT. Extract from the column matching
+  `fiscal_year_end` — not the prior-year column. If in doubt, prefer the leftmost
+  column of the primary financial statement.
+
+- **`total_debt`** = short-term + long-term debt. Some filers report them on separate
+  lines ("Long-term debt" + "Current portion of long-term debt" + "Short-term
+  borrowings"); SUM them. Do NOT include operating lease liabilities, accounts
+  payable, or deferred tax.
+
+- **`free_cash_flow`** — only return a value if the filing states it explicitly.
+  Do NOT compute `operating_cash_flow - capex` yourself; that's an analyst step.
+
+- **`currency`** — reporting currency, typically "USD". Some ADRs use EUR/GBP/JPY.
 - Read column headers carefully — 10-Ks usually show multiple fiscal years side-by-side.
   Extract the values from the **most recent completed fiscal year** column (usually the leftmost
   or the one matching `fiscal_year_end`).

@@ -1,0 +1,13 @@
+{
+  "ticker": "JPM",
+  "cik10": "0000019617",
+  "company_name": "JPMORGAN CHASE & CO",
+  "form": "10-K",
+  "accession": "0001628280-26-008131",
+  "filing_date": "2026-02-13",
+  "reporting_period_end": "2025-12-31",
+  "primary_doc": "jpm-20251231.htm",
+  "source_url": "https://www.sec.gov/Archives/edgar/data/19617/000162828026008131/jpm-20251231.htm",
+  "text_bytes": 1419434,
+  "has_companyfacts": true
+}

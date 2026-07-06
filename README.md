@@ -72,7 +72,7 @@ JSON summary, markdown) land in `evaluation/reports/<timestamp>/` after each run
 |----------|-------------------|-----------|-----------|-----------|------------|--------------|
 | Receipts | SROIE (5)         | **0.938** | **1.000** | 0.20      | **$0.012** | 6.3 s        |
 | Receipts | CORD (5)          | **0.914** | 0.839     | **0.80**  | **$0.012** | 8.2 s        |
-| Filings  | SEC 10-K (n=5)    | **0.560** | **0.569** | 0.00      | **$0.061** | 6.1 s        |
+| Filings  | SEC 10-K (n=5)    | **0.560** | **0.584** | 0.00      | **$0.063** | 6.4 s        |
 
 **Read the numbers:**
 - **Micro F1 ≈ 0.92** across both datasets — the model gets ~92% of individual
@@ -109,6 +109,56 @@ the number reflects that honestly:
 - **Zero extraction errors** on all 5 filings — the section chunker + prompt
   wiring is stable. What's missing is prompt tuning against the specific
   failure modes above, which is where the next 15-20 F1 points live.
+
+### v2.2 — a real diagnose → try → measure loop
+
+The per-field table above told me the money fields were the drag. I hypothesized
+that most of the misses came from the model ignoring "(In millions)" scale
+headers, and pushed three targeted fixes into v2.2:
+
+1. **Prompt reinforcement.** Added a workflow section with four worked examples
+   (Apple, Walmart, a mid-cap in thousands, a small filer in absolute dollars)
+   and an explicit "before finalizing, check the number is physically plausible"
+   step. See `src/extractors/prompts.py::SYSTEM_PROMPT_FILING`.
+2. **Ground-truth builder expansion.** `build_filings_gt.py` FIN_MAP got new
+   XBRL concept fallbacks so bank + insurance filers (JPM specifically) get
+   real `total_debt` and `total_equity` via `Deposits`, `LongTermBorrowings`,
+   and `StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest`.
+3. **Cover-field backfill.** Pulled `exchange` and `state_of_incorporation`
+   into the sidecar from SEC's submissions feed so those cover fields are no
+   longer support=0 in the eval.
+
+**What the numbers said back:**
+
+| Field                             | v2.1 F1 | v2.2 F1 | Verdict |
+|-----------------------------------|--------:|--------:|---------|
+| `financials.revenue`              | 0.250   | **0.500** | ✅ prompt worked — precision 0.33→0.67 |
+| `financials.total_equity`         | 0.000   | **0.286** | ✅ FIN_MAP worked partially |
+| `financials.operating_income`     | 0.500   | **1.000** | ✅ prompt helped, small support |
+| `cover.form_type`                 | 0.600   | **0.800** | ✅ small win  |
+| `financials.total_debt`           | 0.000   | 0.000     | ❌ FIN_MAP change didn't reach the model side |
+| `cover.filing_date`               | 0.333   | 0.000     | ❌ regression — model started returning report_date |
+| **Aggregate micro F1**            | 0.560   | 0.560     | flat |
+
+The aggregate looking flat hides real per-field motion. Two of the three fixes
+partially worked; one didn't move the needle. What this measurement tells me
+about v2.3:
+
+- **Prompt reinforcement has a ceiling.** Two-pass extract-then-verify (first
+  call extracts; second call is prompted with "here's what you just returned —
+  verify the scale factor against the header text you were shown") is the next
+  intervention, not more prompt paragraphs.
+- **`total_debt` on non-financial issuers is a definition problem, not a
+  extraction problem.** The model returns "long-term debt" as printed; XBRL
+  ground truth sums 4+ concepts. Either loosen the comparator or pin the
+  definition in the prompt with "return LongTermDebt only, do not sum."
+- **`filing_date` regression** is the interesting one — the prompt changes
+  around dates may have accidentally biased the model toward the report date.
+  Worth an A/B test on just that field.
+
+The point of the harness is exactly this: a change ships, per-field numbers
+come back, and the next intervention is chosen from data rather than from a
+hunch. That's the loop I wanted to build.
 
 Reproduce locally:
 
@@ -296,7 +346,7 @@ $0.05–0.15 instead of $0.60+ at whole-document context.
 ## Roadmap
 
 - [x] **v1 — Invoices & Receipts pipeline + multi-model benchmark**
-- [x] **v2 — SEC 10-K pipeline** (schema + section chunker + EDGAR downloader, first live eval: 0.56 micro F1, $0.06/doc)
+- [x] **v2 — SEC 10-K pipeline** (schema + section chunker + EDGAR downloader + v2.2 diagnose-loop, micro F1 0.56, $0.06/doc, ready for two-pass verify in v2.3)
 - [ ] v3 — Streaming extraction + async batch API
 - [ ] v4 — Fine-tuning experiment vs. base GPT-5 nano
 

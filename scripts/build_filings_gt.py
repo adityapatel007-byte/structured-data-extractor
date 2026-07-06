@@ -30,26 +30,65 @@ ROOT = Path(__file__).resolve().parents[1]
 # Values are lists of candidate concept names in order of preference — real
 # filers use different names for the same line ("Revenues", "SalesRevenueNet",
 # "RevenueFromContractWithCustomerExcludingAssessedTax"...).
+# US-GAAP concept mapping. Values are ordered lists of candidate concept
+# names — the first one that has an FP='FY' entry for the target fiscal-year
+# end date wins. `total_debt` is special: we SUM all matching concepts because
+# real filers split debt across many line items (short-term borrowings +
+# long-term debt current portion + long-term debt noncurrent + notes payable).
+#
+# v2.2 expansions:
+# - Added Deposits + LongTermBorrowings so banks (JPM) get real total_debt.
+# - Added StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest
+#   as first choice for total_equity (matches how large filers actually report).
+# - Added several revenue variants (retail filers use SalesRevenueGoodsNet, etc.).
+# - Added short-term debt concepts (ShortTermBorrowings, etc.) into total_debt sum.
 FIN_MAP = {
     "revenue": [
         "Revenues",
         "RevenueFromContractWithCustomerExcludingAssessedTax",
+        "RevenueFromContractWithCustomerIncludingAssessedTax",
         "SalesRevenueNet",
+        "SalesRevenueGoodsNet",
     ],
-    "cost_of_revenue": ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold"],
+    "cost_of_revenue": [
+        "CostOfRevenue",
+        "CostOfGoodsAndServicesSold",
+        "CostOfGoodsSold",
+    ],
     "gross_profit": ["GrossProfit"],
-    "operating_income": ["OperatingIncomeLoss"],
-    "net_income": ["NetIncomeLoss"],
-    "eps_basic":   ["EarningsPerShareBasic"],
-    "eps_diluted": ["EarningsPerShareDiluted"],
-    "cash_and_equivalents": ["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsAndShortTermInvestments"],
+    "operating_income": ["OperatingIncomeLoss", "IncomeLossFromContinuingOperations"],
+    "net_income": [
+        "NetIncomeLoss",
+        "ProfitLoss",
+        "NetIncomeLossAttributableToParent",
+    ],
+    "eps_basic":   ["EarningsPerShareBasic",   "IncomeLossFromContinuingOperationsPerBasicShare"],
+    "eps_diluted": ["EarningsPerShareDiluted", "IncomeLossFromContinuingOperationsPerDilutedShare"],
+    "cash_and_equivalents": [
+        "CashAndCashEquivalentsAtCarryingValue",
+        "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+        "CashCashEquivalentsAndShortTermInvestments",
+    ],
     "total_assets": ["Assets"],
-    "total_equity": ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"],
-    "total_debt": [  # sum of short-term + long-term where separately reported
+    "total_equity": [
+        "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+        "StockholdersEquity",
+    ],
+    "total_debt": [  # SUM of every matching concept — filers split debt many ways
         "LongTermDebt",
         "LongTermDebtNoncurrent",
+        "LongTermDebtCurrent",
+        "LongTermBorrowings",   # banks (JPM, Citi) use this instead of LongTermDebt
+        "ShortTermBorrowings",
+        "CommercialPaper",
+        "DebtCurrent",
+        "DebtLongtermAndShorttermCombinedAmount",
+        "Deposits",             # bank funding — treat as debt for a bank
     ],
-    "operating_cash_flow": ["NetCashProvidedByUsedInOperatingActivities"],
+    "operating_cash_flow": [
+        "NetCashProvidedByUsedInOperatingActivities",
+        "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations",
+    ],
 }
 
 
@@ -113,6 +152,14 @@ def build_row(txt_path: Path) -> dict | None:
     facts = json.loads(facts_path.read_text(encoding="utf-8")) if facts_path.exists() else None
 
     fy_end = meta["reporting_period_end"]
+    # Backfill exchange + state_of_incorporation from the SEC submissions feed
+    # (both were added to the sidecar in download_edgar.py v2.2). If they're
+    # missing (older sidecar without the field), fall back to None — the
+    # schema field is Optional so this doesn't fail extraction.
+    exchange = meta.get("exchange")
+    # Prefer the two-letter code (matches the schema validator that uppercases + strips).
+    state = meta.get("state_of_incorporation") or meta.get("state_of_incorporation_desc")
+
     cover = {
         "company_name": meta["company_name"],
         "cik": meta["cik10"],
@@ -121,6 +168,10 @@ def build_row(txt_path: Path) -> dict | None:
         "fiscal_year_end": fy_end,
         "filing_date": meta["filing_date"],
     }
+    if exchange:
+        cover["exchange"] = exchange
+    if state:
+        cover["state_of_incorporation"] = state
     financials = build_financials(facts, fy_end) if facts else {"currency": "USD", "fiscal_year": int(fy_end[:4])}
 
     return {

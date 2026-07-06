@@ -1,0 +1,13 @@
+{
+  "ticker": "WMT",
+  "cik10": "0000104169",
+  "company_name": "Walmart Inc.",
+  "form": "10-K",
+  "accession": "0000104169-26-000055",
+  "filing_date": "2026-03-13",
+  "reporting_period_end": "2026-01-31",
+  "primary_doc": "wmt-20260131.htm",
+  "source_url": "https://www.sec.gov/Archives/edgar/data/104169/000010416926000055/wmt-20260131.htm",
+  "text_bytes": 384561,
+  "has_companyfacts": true
+}

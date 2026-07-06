@@ -1,0 +1,13 @@
+{
+  "ticker": "AAPL",
+  "cik10": "0000320193",
+  "company_name": "Apple Inc.",
+  "form": "10-K",
+  "accession": "0000320193-25-000079",
+  "filing_date": "2025-10-31",
+  "reporting_period_end": "2025-09-27",
+  "primary_doc": "aapl-20250927.htm",
+  "source_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+  "text_bytes": 221468,
+  "has_companyfacts": true
+}

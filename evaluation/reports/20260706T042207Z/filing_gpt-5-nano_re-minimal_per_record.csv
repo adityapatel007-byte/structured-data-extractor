@@ -1,0 +1,118 @@
+doc_id,field,field_type,predicted,truth,outcome,score,latency_ms,cost_usd
+filing_AAPL_2025-09-27,cover.cik,text,0000320193,0000320193,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,cover.company_name,text,Apple Inc.,Apple Inc.,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,cover.exchange,text,Nasdaq Global Select Market,,FP,0.0,11261.3,0.096452
+filing_AAPL_2025-09-27,cover.filing_date,date,,2025-10-31,FN,0.0,11261.3,0.096452
+filing_AAPL_2025-09-27,cover.fiscal_year_end,date,2025-09-27,2025-09-27,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,cover.form_type,text,10-K,10-K,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,cover.state_of_incorporation,text,US,,FP,0.0,11261.3,0.096452
+filing_AAPL_2025-09-27,cover.ticker,text,AAPL,AAPL,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.cash_and_equivalents,number,35934000000,35934000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.cost_of_revenue,number,220960000000,220960000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.currency,exact,USD,USD,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.eps_basic,number,7.49,7.49,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.eps_diluted,number,7.46,7.46,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.fiscal_year,number,2025,2025,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.gross_profit,number,195201000000,195201000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.net_income,number,112010000000,112010000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.operating_cash_flow,number,111482000000,111482000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.operating_income,number,133050000000,133050000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.revenue,number,416161000000,416161000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.total_assets,number,359241000000,359241000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.total_debt,number,90678000000,189335000000,MISMATCH,0.0,11261.3,0.096452
+filing_AAPL_2025-09-27,financials.total_equity,number,73733000000,73733000000,TP,1.0,11261.3,0.096452
+filing_AAPL_2025-09-27,top_risk_factors[],number,0,0,TP,1.0,11261.3,0.096452
+filing_JPM_2025-12-31,cover.cik,text,0000019617,0000019617,TP,1.0,2707.0,0.05048
+filing_JPM_2025-12-31,cover.company_name,text,JPMorgan Chase & Co.,JPMORGAN CHASE & CO,TP,0.974,2707.0,0.05048
+filing_JPM_2025-12-31,cover.exchange,text,New York Stock Exchange,,FP,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,cover.filing_date,date,,2026-02-13,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,cover.fiscal_year_end,date,2026-12-31,2025-12-31,MISMATCH,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,cover.form_type,text,FY,10-K,MISMATCH,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,cover.ticker,text,JPM,JPM,TP,1.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.cash_and_equivalents,number,,343338000000,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.currency,exact,USD,USD,TP,1.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.eps_basic,number,,20.05,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.eps_diluted,number,,20.02,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.fiscal_year,number,2025,2025,TP,1.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.net_income,number,,57048000000,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.operating_cash_flow,number,,-147782000000,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.revenue,number,,182447000000,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.total_assets,number,,4424900000000,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.total_debt,number,,2624096000000,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,financials.total_equity,number,,362438000000,FN,0.0,2707.0,0.05048
+filing_JPM_2025-12-31,top_risk_factors[],number,0,0,TP,1.0,2707.0,0.05048
+filing_PFE_2025-12-31,cover.cik,text,0000078003,0000078003,TP,1.0,2382.9,0.039157
+filing_PFE_2025-12-31,cover.company_name,text,Pfizer Inc.,PFIZER INC,TP,0.952,2382.9,0.039157
+filing_PFE_2025-12-31,cover.exchange,text,New York Stock Exchange,,FP,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,cover.filing_date,date,,2026-02-26,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,cover.fiscal_year_end,date,2025-12-31,2025-12-31,TP,1.0,2382.9,0.039157
+filing_PFE_2025-12-31,cover.form_type,text,FORM 10-K,10-K,TP,1.0,2382.9,0.039157
+filing_PFE_2025-12-31,cover.state_of_incorporation,text,DE,,FP,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,cover.ticker,text,PFE,PFE,TP,1.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.cash_and_equivalents,number,,1142000000,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.cost_of_revenue,number,,16067000000,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.currency,exact,USD,USD,TP,1.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.eps_basic,number,,1.37,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.eps_diluted,number,,1.36,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.fiscal_year,number,2025,2025,TP,1.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.net_income,number,,7771000000,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.operating_cash_flow,number,,11704000000,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.revenue,number,,62579000000,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.total_assets,number,,208160000000,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.total_debt,number,,67792000000,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,financials.total_equity,number,,86775000000,FN,0.0,2382.9,0.039157
+filing_PFE_2025-12-31,top_risk_factors[],number,0,0,TP,1.0,2382.9,0.039157
+filing_WMT_2026-01-31,cover.cik,text,0000104169,0000104169,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,cover.company_name,text,Walmart Inc.,Walmart Inc.,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,cover.exchange,text,New York Stock Exchange,,FP,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,cover.filing_date,date,,2026-03-13,FN,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,cover.fiscal_year_end,date,2026-01-31,2026-01-31,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,cover.form_type,text,10-K,10-K,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,cover.ticker,text,WMT,WMT,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.cash_and_equivalents,number,0,10727000000,MISMATCH,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.cost_of_revenue,number,0,535395000000,MISMATCH,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.currency,exact,USD,USD,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.eps_basic,number,,2.74,FN,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.eps_diluted,number,,2.73,FN,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.fiscal_year,number,2026,2026,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.free_cash_flow,number,14923000000,,FP,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.gross_profit,number,171018000000,,FP,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.net_income,number,22270000000,21893000000,MISMATCH,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.operating_cash_flow,number,41565000000,41565000000,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.operating_income,number,29825000000,29825000000,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.revenue,number,713163000000,713163000000,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.total_assets,number,284668000000,284668000000,TP,1.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.total_debt,number,38016600000,82928000000,MISMATCH,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,financials.total_equity,number,0,105887000000,MISMATCH,0.0,9462.5,0.0697
+filing_WMT_2026-01-31,top_risk_factors[],number,0,0,TP,1.0,9462.5,0.0697
+filing_XOM_2025-12-31,cover.cik,text,0000034088,0000034088,TP,1.0,6160.1,0.058725
+filing_XOM_2025-12-31,cover.company_name,text,Exxon Mobil Corporation,EXXON MOBIL CORP,MISMATCH,0.821,6160.1,0.058725
+filing_XOM_2025-12-31,cover.exchange,text,NYSE (New York Stock Exchange),,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,cover.filing_date,date,,2026-02-18,FN,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,cover.fiscal_year_end,date,2025-12-31,2025-12-31,TP,1.0,6160.1,0.058725
+filing_XOM_2025-12-31,cover.form_type,text,10-K,10-K,TP,1.0,6160.1,0.058725
+filing_XOM_2025-12-31,cover.state_of_incorporation,text,DE,,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,cover.ticker,text,XOM,XOM,TP,1.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.cash_and_equivalents,number,,10681000000,FN,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.cost_of_revenue,number,184248000000,,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.currency,exact,USD,USD,TP,1.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.eps_basic,number,,6.7,FN,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.eps_diluted,number,,6.7,FN,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.fiscal_year,number,2025,2025,TP,1.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.net_income,number,287,28844000000,MISMATCH,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.operating_cash_flow,number,52000000000,51970000000,MISMATCH,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.revenue,number,323905000000,332238000000,MISMATCH,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.total_assets,number,,448980000000,FN,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.total_debt,number,43900000000,18555000000,MISMATCH,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,financials.total_equity,number,,266626000000,FN,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[0].summary,text,"The filing discusses oil, gas, and product price exposures and sensitivity analyses, including Brent,Henry Hub, and TTF prices, and notes that sensitivities to price changes could affect earnings and cash flows.",,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[0].theme,text,Market risk exposure,,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[1].summary,text,"The Company discusses large, long-term capital expenditures, acquisitions (e.g., Pioneer), and debt management, highlighting plans and liquidity considerations.",,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[1].theme,text,Capital investment and liquidity,,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[2].summary,text,"Impairment testing, potential impairment charges, and asset retirement obligations are described, including impairment history and triggers.",,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[2].theme,text,Impairment and asset risk,,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[3].summary,text,"Taxes and legal contingencies are discussed, including income taxes, other taxes, and ongoing litigation with potential financial impact.",,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[3].theme,text,Tax and litigation contingencies,,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[4].summary,text,"Environmental expenditures, obligations, and greenhouse gas considerations are discussed as part of long-term planning and compliance.",,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[4].theme,text,Environmental and regulatory,,FP,0.0,6160.1,0.058725
+filing_XOM_2025-12-31,top_risk_factors[],number,5,0,MISMATCH,0.0,6160.1,0.058725

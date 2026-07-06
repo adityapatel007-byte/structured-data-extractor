@@ -74,6 +74,9 @@ def latest_10k_metadata(cik10: str) -> dict:
     r = _get(f"https://data.sec.gov/submissions/CIK{cik10}.json")
     payload = r.json()
     recent = payload["filings"]["recent"]
+    # SEC submissions feed carries a top-level exchanges array + state_of_incorporation.
+    # Both live *outside* the recent-filings block, so they carry per-issuer, not per-filing.
+    exchanges = payload.get("exchanges") or []
     for i, form in enumerate(recent["form"]):
         if form == "10-K":
             return {
@@ -84,6 +87,10 @@ def latest_10k_metadata(cik10: str) -> dict:
                 "filing_date": recent["filingDate"][i],
                 "reporting_period_end": recent["reportDate"][i],
                 "primary_doc": recent["primaryDocument"][i],
+                # NEW in v2.2 — used by build_filings_gt.py to backfill cover ground truth.
+                "exchange": exchanges[0] if exchanges else None,   # e.g. "Nasdaq"
+                "state_of_incorporation": payload.get("stateOfIncorporation") or None,
+                "state_of_incorporation_desc": payload.get("stateOfIncorporationDescription") or None,
             }
     raise RuntimeError(f"No 10-K found in recent filings for CIK {cik10}")
 
