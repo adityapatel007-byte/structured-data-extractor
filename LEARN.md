@@ -393,48 +393,53 @@ fixes (prompt worked examples, FIN_MAP expansion for banks, cover backfill)
 stayed flat because filing_date regressed and total_debt didn't move. Full
 diagnose→try→measure narrative in the README. **30 new tests, 126 total.**
 
-### v3 — Streaming extraction + async batch API 🔜
+### v3 — Streaming extraction + async batch API ✅
 
-**Two orthogonal features that ship together because they both change the
-API shape.**
+**Shipped 2026-07-06.** Two extra endpoints landed alongside `POST /extract`:
 
-**Streaming extraction.** Right now `/extract` waits 5-8 seconds for the full
-completion, then returns the whole `ExtractionResult`. That's fine for one
-doc, poor UX for a big 10-K. Streaming means the API returns
-**Server-Sent Events**: as OpenAI streams tokens, we forward chunks to the
-client, which shows fields "appearing" one at a time in the UI.
+**Streaming (`POST /extract/stream`).** Returns Server-Sent Events. Each
+frame is `event: <name>\ndata: <json>\n\n`. The stages we emit are
+`starting`, `loading`, `model_call`, `validated`, then `result` with the
+full validated `ExtractionResult`, then `done`. Errors are in-band
+`error` events (the HTTP 200 has already gone out by the time the
+extractor raises).
 
-Concretely:
-- `POST /extract/stream` → `Content-Type: text/event-stream`, one JSON event
-  per field, terminated with `event: done`.
-- FastAPI uses `StreamingResponse` + `sse-starlette`.
-- OpenAI SDK: `client.chat.completions.parse(stream=True)` iterates chunks.
-- The UI hook `useExtract` becomes an `EventSource` consumer; the
-  `ResultsPanel` renders fields as they arrive.
-- Complication: `parse(stream=True)` doesn't give partial validated objects
-  — you get raw JSON text you have to accumulate + parse yourself. That's
-  where a token-safe streaming parser (`json-stream`, `ijson`) earns its
-  keep.
+Why *progress events* instead of *partial JSON deltas*: OpenAI's
+`chat.completions.parse()` with `stream=True` yields raw token chunks,
+not partial validated Pydantic objects. To emit field-by-field you'd
+have to run your own streaming JSON parser (`ijson` / `json-stream`)
+that tolerates mid-value boundaries, then re-validate the accumulated
+object against the envelope schema — that gets fragile on nested arrays
+(line items, risk factors). Shipping progress events is the honest UX
+without the JSON-stream footguns. If OpenAI adds object-level streaming
+for structured outputs later, we extend this endpoint with `partial`
+events on top of the existing progress ones — the SSE format welcomes
+both.
 
-**Async batch API.** For enterprise use — imagine uploading 500 vendor
-invoices at once. Client submits, gets a job ID, polls or subscribes for
-results.
+**Batch (`POST /extract/batch` + `GET /extract/batch/{job_id}`).**
+Multipart with N files. Returns 202 with a `job_id` immediately;
+extraction runs in FastAPI `BackgroundTasks`. `GET` returns a snapshot:
+overall status, per-item status, per-item result/metrics/error as they
+land. Poll every 1-3s.
 
-Concretely:
-- `POST /extract/batch` with a list of file URLs (or a zip) → returns `job_id`.
-- `GET /extract/batch/{job_id}` → status + partial results.
-- Backend: an `asyncio.Queue` fanning docs out to N concurrent extractors
-  (Semaphore-limited to respect OpenAI rate limits). No Redis / RQ needed —
-  the docs are small, the state fits in memory. If we scaled beyond one
-  container we'd swap in Redis + RQ.
-- Cost tracking rolls up to per-batch totals.
+Concurrency architecture (`src/api/batch_store.py`):
 
-**Why this matters on your resume**: streaming + batching are the two things
-that separate "LLM demo" from "LLM product." Hiring managers see this and
-think you've been in production.
+- One in-memory `dict` guarded by an `asyncio.Lock` = the job store.
+  Restart wipes it — that's the accepted tradeoff at this scale. Prod
+  swaps Redis + RQ in without touching the API.
+- One `asyncio.Semaphore(5)` initialized on first use, shared across
+  every in-flight job. OpenAI rate limits are per-org, not per-job, so
+  job-scoped limits wouldn't protect us.
+- Extraction runs via `asyncio.to_thread(extractor.extract, …)` because
+  the openai-python SDK is synchronous under `.parse()`. Threading keeps
+  the event loop free to service `GET /extract/batch/{id}` polls and to
+  fan work out to the next job.
 
-**Estimated work**: 1-2 sessions. No new API cost — same extractor, different
-wrapper.
+**Tests: 12 new (in `tests/unit/test_api_v3.py`), 138 total.** All use the
+injected fake extractor — no OpenAI key required in CI.
+
+**Estimated work: shipped in 1 session, no API cost.** Same extractor,
+different wrappers.
 
 ### v4 — Fine-tuning experiment vs. base GPT-5 nano 🔜
 

@@ -18,9 +18,11 @@ from fastapi.responses import JSONResponse
 
 from src.api.errors import APIError, ErrorDetail, ErrorEnvelope
 from src.api.middleware import AccessLogMiddleware, RequestIDMiddleware
+from src.api.routers import batch as batch_router
 from src.api.routers import extract as extract_router
 from src.api.routers import health as health_router
 from src.api.routers import schemas as schemas_router
+from src.api.routers import stream as stream_router
 from src.utils.logging import logger
 
 
@@ -52,6 +54,8 @@ def create_app() -> FastAPI:
     app.include_router(health_router.router)
     app.include_router(schemas_router.router)
     app.include_router(extract_router.router)
+    app.include_router(stream_router.router)   # POST /extract/stream (SSE)      — v3
+    app.include_router(batch_router.router)    # POST /extract/batch + GET /...  — v3
 
     # --- Error handlers ----------------------------------------------------
     @app.exception_handler(APIError)

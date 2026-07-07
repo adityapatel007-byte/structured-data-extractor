@@ -39,6 +39,7 @@ Enterprise doc extraction is one of the highest-demand LLM use cases in 2026. Th
 - Schema-driven extraction with **OpenAI structured outputs** + Pydantic validation
 - **Vision-language handling** for scanned/image PDFs (GPT-5 nano vision)
 - **Long-document handling** for 10-K filings — regex section chunker slices Items 1A + 8 out of ~150K-token documents to hit **$0.06/doc** (would've been ~$0.60/doc whole-doc)
+- **Streaming + async batch API** — `POST /extract/stream` emits Server-Sent Events for progress + result; `POST /extract/batch` fans up to 5 concurrent extractions across N documents with per-item status tracking
 - **Multi-model benchmarking** — empirically compared gpt-5-nano vs gpt-5-mini vs gpt-5 on the same 10-record eval; nano is Pareto-optimal (micro F1 0.896 at $0.012/doc)
 - **Evaluation harness** with precision / recall / F1 on public ground truth (SROIE, CORD)
 - **Cost + latency observability** — every extraction logs tokens and $
@@ -208,6 +209,43 @@ python scripts/run_multimodel_benchmark.py gpt-5-nano:minimal gpt-5-mini:minimal
 Next: real image PDFs from the SROIE test split for a stricter, OCR-inclusive
 number, then the SEC 10-K schema for the long-doc / dual-domain story.
 
+## Streaming + async batch (v3)
+
+Two extra endpoints exist alongside the vanilla `POST /extract`:
+
+**`POST /extract/stream`** — same input as `/extract`, but returns
+`Content-Type: text/event-stream`. The response is a Server-Sent Events
+stream with `progress` events at each pipeline stage (`starting` →
+`loading` → `model_call` → `validated`), a `result` event carrying the full
+`ExtractionResult`, and a terminal `done` event. Errors surface as an
+in-band `error` event because the HTTP 200 has already been sent by then.
+Design note: the openai-python `.parse()` API doesn't yield partial
+validated Pydantic objects (structured outputs strict mode returns the
+final object only), so we ship progress events rather than partial JSON.
+That's the honest UX — the user sees "something is happening" and the
+answer arrives whole.
+
+**`POST /extract/batch`** — multipart with N files. Returns `202 Accepted`
++ `{job_id, status: "pending"}` immediately; extraction runs in
+FastAPI `BackgroundTasks`. Poll `GET /extract/batch/{job_id}` for the
+snapshot. Concurrency is capped globally at 5 via an `asyncio.Semaphore`
+sized to stay under OpenAI's per-org rate limits even with multiple
+in-flight jobs. Job store is in-memory (one dict + one asyncio lock per
+worker) — swap Redis in for horizontal scale without touching the API.
+
+```bash
+# Batch:
+curl -X POST http://localhost:8000/extract/batch \
+  -F "doc_type=receipt" \
+  -F "files=@receipt1.png" \
+  -F "files=@receipt2.png" \
+  -F "files=@invoice.pdf"
+# -> {"job_id":"abc123...", "status":"pending", "progress":{"total":3,...}}
+
+curl http://localhost:8000/extract/batch/abc123
+# -> {"status":"done","progress":{...},"items":[{...result...},...]}
+```
+
 ## Architecture
 
 ```
@@ -347,7 +385,7 @@ $0.05–0.15 instead of $0.60+ at whole-document context.
 
 - [x] **v1 — Invoices & Receipts pipeline + multi-model benchmark**
 - [x] **v2 — SEC 10-K pipeline** (schema + section chunker + EDGAR downloader + v2.2 diagnose-loop, micro F1 0.56, $0.06/doc, ready for two-pass verify in v2.3)
-- [ ] v3 — Streaming extraction + async batch API
+- [x] **v3 — Streaming + async batch API** (SSE progress events; in-memory job store with global asyncio semaphore capping concurrency at 5; 12 new tests)
 - [ ] v4 — Fine-tuning experiment vs. base GPT-5 nano
 
 ## License
