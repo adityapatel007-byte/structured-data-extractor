@@ -441,36 +441,61 @@ injected fake extractor — no OpenAI key required in CI.
 **Estimated work: shipped in 1 session, no API cost.** Same extractor,
 different wrappers.
 
-### v4 — Fine-tuning experiment vs. base GPT-5 nano 🔜
+### v4 — Fine-tuning experiment vs. base GPT-5 nano ✅
 
-**Fine-tune a copy of gpt-5-nano (or gpt-4o-mini as the cheaper baseline) on
-~200-500 receipt / invoice examples pulled from SROIE and CORD training
-splits. Benchmark against the base model on the same 10-record eval you've
-been using.**
+**Shipped 2026-07-06 (code + tests + docs).** Real-scale training run pending
+on your side.
 
-Concretely:
-- Fine-tuning is OpenAI's hosted service. You upload a JSONL of examples in
-  chat-completion format: `{"messages": [{system}, {user, file+prompt},
-  {assistant, expected JSON}]}`. OpenAI trains a copy. You call it via a
-  custom model ID (`ft:gpt-5-nano:your-org:receipts-2026:abc123`).
-- **What to expect**: the fine-tuned model will score *higher* F1 on this
-  specific schema (probably 0.94 → 0.97+ on receipts) but is billed at a
-  higher per-token rate. And it only knows your schema — a schema change
-  means retraining.
-- **What you'd actually write about**: not "look, F1 went up," but "here's
-  when you should fine-tune vs. when you should prompt-tune." Most schemas
-  don't need fine-tuning; ours got 0.94 F1 with prompting alone. The
-  interesting answer to a hiring manager is "I tried fine-tuning and
-  measured that the marginal quality gain wasn't worth the ongoing cost +
-  schema lock-in for this workload."
+**Three scripts, one loop:**
 
-**Estimated work**: 2-3 sessions. **Cost**: ~$5-20 for the training run
-depending on example count and epochs.
+- `scripts/prep_ft_dataset.py` — reads a receipt/invoice JSONL (must have
+  `text` + `ground_truth`), converts each row to OpenAI's chat-completions
+  fine-tuning format. The system message is the *exact* production prompt
+  (`get_prompt(doc_type)`); the user message is the *exact* production shape
+  (`---BEGIN DOCUMENT TEXT---` block); the assistant message is the
+  envelope (`{data, field_confidences, warnings}`) with the ground truth as
+  `data`. If any of those diverge from what `DocumentExtractor` sends at
+  inference, the fine-tune won't transfer — hence the shape-matching tests.
+  80/20 train/val split, deterministic per `--seed`.
 
-**Why this matters on your resume**: fine-tuning is a keyword hiring
-managers screen for, but "I fine-tuned and F1 went up" is a junior answer.
-"I fine-tuned, measured, and chose *not* to ship it because the cost model
-didn't work for this schema" is a senior answer.
+- `scripts/launch_finetune.py` — uploads train + val files via
+  `client.files.create(purpose="fine-tune")`, kicks off the job via
+  `client.fine_tuning.jobs.create()`, then polls status every 30 s until
+  the job finishes. `Ctrl-C` detaches cleanly (the job keeps running on
+  OpenAI's side). Default target is `gpt-4o-mini-2024-07-18` — the
+  cheapest reliable fine-tune base at ~$3 / 1M training tokens.
+
+- `scripts/compare_finetune.py` — takes the resulting `ft-model` id and
+  runs the same 10-record smoke eval (SROIE + CORD) against both the base
+  gpt-5-nano @ minimal and the fine-tune, emits a side-by-side comparison
+  table (`evaluation/finetuning/<timestamp>/comparison.{md,csv,json}`) —
+  same shape as the multi-model benchmark.
+
+**9 new tests** in `tests/unit/test_prep_ft_dataset.py` — pure JSON
+transformation tests, no network. Confirms the fine-tuning JSONL is
+valid OpenAI chat format, the assistant content is a valid envelope, the
+system prompt matches production, the user shape matches
+`DocumentExtractor._build_messages()`, the 80/20 split is deterministic,
+malformed rows are skipped without crashing, and OpenAI's ≥10-example
+minimum is warned about explicitly.
+
+**The interesting resume story** isn't "F1 went up." It's the tradeoff:
+gpt-5-nano @ minimal already hits 0.94 F1 on receipts at $0.012/doc with
+no schema lock-in. A fine-tuned gpt-4o-mini will probably beat that on
+F1 (say 0.96+) at ~2× per-token cost, and only for *this schema* — a
+schema change means retraining. Whether you ship it is a
+business-tradeoff question, not a technical one. **Senior answer**:
+"I built the pipeline, ran it, and the numbers didn't justify shipping
+the fine-tune for a schema this small and this well-served by
+prompting." **Junior answer**: "I fine-tuned and F1 went up." Pick your
+audience.
+
+**To run the real experiment**, you need > 10 training examples — the
+smoke datasets have 5 each. Pull the full SROIE / CORD splits with
+`python scripts/prep_datasets.py all` first, then point
+`prep_ft_dataset.py --input data/processed/sroie.jsonl` at the fuller
+data. Realistic cost: **$0.50-$2 to train, $0.30-$0.80 for the
+comparison eval** on gpt-4o-mini.
 
 ---
 

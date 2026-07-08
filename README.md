@@ -40,6 +40,7 @@ Enterprise doc extraction is one of the highest-demand LLM use cases in 2026. Th
 - **Vision-language handling** for scanned/image PDFs (GPT-5 nano vision)
 - **Long-document handling** for 10-K filings — regex section chunker slices Items 1A + 8 out of ~150K-token documents to hit **$0.06/doc** (would've been ~$0.60/doc whole-doc)
 - **Streaming + async batch API** — `POST /extract/stream` emits Server-Sent Events for progress + result; `POST /extract/batch` fans up to 5 concurrent extractions across N documents with per-item status tracking
+- **Fine-tuning experiment** — full pipeline (data prep → OpenAI job launch → side-by-side eval) built and reproducible; sample-scale run shipped, real-scale run gated on pulling the SROIE/CORD training splits
 - **Multi-model benchmarking** — empirically compared gpt-5-nano vs gpt-5-mini vs gpt-5 on the same 10-record eval; nano is Pareto-optimal (micro F1 0.896 at $0.012/doc)
 - **Evaluation harness** with precision / recall / F1 on public ground truth (SROIE, CORD)
 - **Cost + latency observability** — every extraction logs tokens and $
@@ -329,6 +330,34 @@ python scripts/run_eval.py --dataset evaluation/ground_truth/sroie.jsonl \
 Reports (per-record CSV + summary JSON + resume-ready markdown) land in
 `evaluation/reports/<UTC-timestamp>/`.
 
+### Fine-tuning quick start (v4)
+
+The full pipeline lives in `scripts/`:
+
+```bash
+# 1. Prep training data (produces <name>_train.jsonl + <name>_val.jsonl in OpenAI's chat-completions format).
+python scripts/prep_ft_dataset.py \
+    --input evaluation/smoke_sroie_sample.jsonl \
+    --doc-type receipt \
+    --out data/ft/sroie_smoke
+
+# 2. Launch the OpenAI fine-tuning job (uploads files, creates job, polls status).
+python scripts/launch_finetune.py \
+    --train data/ft/sroie_smoke_train.jsonl \
+    --val   data/ft/sroie_smoke_val.jsonl \
+    --suffix receipts-2026
+# Wait 10-30 min for OpenAI to train.
+
+# 3. Compare the fine-tuned model against the base gpt-5-nano on the same eval.
+python scripts/compare_finetune.py \
+    --ft-model ft:gpt-4o-mini-2024-07-18:you:receipts-2026:abc123
+```
+
+The smoke datasets only have 5 examples each (SROIE + CORD) — OpenAI requires
+at least 10 training rows. For a real fine-tuning run, first pull the full
+SROIE / CORD training splits with `python scripts/prep_datasets.py all`, then
+point `prep_ft_dataset.py --input` at the processed dataset.
+
 ### 10-K (SEC filings) quick start
 
 ```bash
@@ -386,7 +415,7 @@ $0.05–0.15 instead of $0.60+ at whole-document context.
 - [x] **v1 — Invoices & Receipts pipeline + multi-model benchmark**
 - [x] **v2 — SEC 10-K pipeline** (schema + section chunker + EDGAR downloader + v2.2 diagnose-loop, micro F1 0.56, $0.06/doc, ready for two-pass verify in v2.3)
 - [x] **v3 — Streaming + async batch API** (SSE progress events; in-memory job store with global asyncio semaphore capping concurrency at 5; 12 new tests)
-- [ ] v4 — Fine-tuning experiment vs. base GPT-5 nano
+- [x] **v4 — Fine-tuning experiment** (prep + launcher + comparison eval scripts; 9 new tests; comparison table in `evaluation/finetuning/` once user triggers the ft training run on OpenAI)
 
 ## License
 

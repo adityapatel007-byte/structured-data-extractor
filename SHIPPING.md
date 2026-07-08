@@ -8,7 +8,7 @@
 
 **Preferred (single line, ~35 words):**
 
-> Built a production-grade document-extraction service (invoices, receipts, SEC 10-Ks) — FastAPI + Pydantic + GPT-5 with schema-driven structured outputs; 0.94 F1 on receipts at $0.012/doc, benchmarked 3 model tiers, deployed to Hugging Face Spaces.
+> Built a production-grade document-extraction service (invoices, receipts, SEC 10-Ks) — FastAPI + Pydantic + GPT-5 with schema-driven structured outputs, streaming SSE + async batch API, and a fine-tuning experimentation pipeline; 0.94 F1 on receipts at $0.012/doc, benchmarked 3 model tiers, deployed to Hugging Face Spaces.
 
 **Alt (two lines, if you have room):**
 

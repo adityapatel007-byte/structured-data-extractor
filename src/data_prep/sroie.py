@@ -60,8 +60,19 @@ def normalize_sroie_record(record: dict[str, Any]) -> Receipt | None:
 
     Returns None if we can't extract the minimum required fields (merchant + total).
     """
-    # Unwrap common nesting patterns.
-    src = record.get("parsed_data") or record.get("ground_truth") or record
+    # Unwrap common nesting patterns. HF datasets sometimes store the annotation
+    # as a JSON *string* (parquet doesn\'t love nested dicts), so try to parse
+    # string values before treating them as opaque.
+    import json as _json
+    _raw = record.get("parsed_data") or record.get("ground_truth") or record
+    if isinstance(_raw, str):
+        try:
+            _raw = _json.loads(_raw)
+        except Exception:
+            return None    # unparseable — skip this record rather than crash
+    if not isinstance(_raw, dict):
+        return None
+    src = _raw
 
     company = clean_text(src.get("company") or src.get("merchant"))
     address = clean_text(src.get("address"))
